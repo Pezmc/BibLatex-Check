@@ -8,8 +8,8 @@ These links help retrieving missing information and correcting the entries effic
 
 Please note that it is not a BibLaTeX validator. And in the current version, it might not yet be able to parse every valid bib file. The software targets the specific needs of Computer Scientist, but may be applicable in other fields as well.
 
-Getting Started
-===
+##Getting Started
+
 Just copy the file into a directory with write permission, then either:
 
  * Change properties in the file to point to the bib file you want to test, and run the script with Python 3
@@ -19,6 +19,14 @@ If you provide the additional aux file (usually created when compiling a tex doc
 
 The html output is tested with Firefox and Chrome, but the current version does not properly work with Internet Explorer.
 
-Screenshot
-===
+##Screenshot
 ![Screenshots of the BibLatex check screen](/../screenshots/screenshots/checkscreen.png?raw=true "BibLatex Check")
+
+##License
+MIT license
+
+##Alternatives
+BibLatex check is adapted from [BibTex Check](https://code.google.com/p/bibtex-check/) by Fabian Beck, which can be used to validate BibTex files.
+
+See [BibTex vs BibLaTex vs NatBib](http://tex.stackexchange.com/questions/25701/bibtex-vs-biber-and-biblatex-vs-natbib) for a comparison of different referencing packages.
+
