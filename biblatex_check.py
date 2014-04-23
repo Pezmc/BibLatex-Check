@@ -1,22 +1,24 @@
 #!/usr/bin/env python
 
 """
-BibTeX check on missing fields and consistent name conventions (no BibTeX validator),
+BibLaTeX check on missing fields and consistent name conventions,
 especially developed for requirements in Computer Science. 
 """
 
-__author__ = "Fabian Beck"
-__version__ = "0.2.0"
+__author__ = "Pez Cuckow based on "
+__version__ = "0.0.1"
+__credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
+__email__ = "email<at>pezcuckow.com"
 
 ####################################################################
 # Properties (please change according to your needs)
 ####################################################################
 
 # files
-bibFile = "test.bib"
-auxFile = "test.aux"                # use "" to deactivate restricting the check to the entries listed in the aux file
-htmlOutput = "bibtex_check.html"
+bibFile = "references.bib"
+auxFile = ""                # use "" to deactivate restricting the check to the entries listed in the aux file
+htmlOutput = "biblatex_check.html"
 
 # links
 citeulikeUsername = ""              # if no username is profided, no CiteULike links appear
@@ -26,18 +28,40 @@ googleHref = "https://www.google.de/search?q="
 dblpHref = "http://dblp.org/search/index.php#query="
 
 # fields that are required for a specific type of entry 
-requiredFields = (("inproceedings",("author","booktitle","pages","publisher","title","year")),
-                ("article",("author","journal","number","pages","title","volume","year")),
-                ("techreport",("author","institution","title","year")),
-                ("incollection",("author","booktitle","pages","publisher","title","year")),
-                ("book",("author","publisher","title","year")),
-                ("inbook",("author","booktitle","pages","publisher","title","year")),
-                ("proceedings",("editor","publisher","title","year")),
-                ("phdthesis",("author","school","title","year")),
-                ("mastersthesis",("author","school","title","year")),
-                ("electronic",("author","title","url","year")),
-                ("misc",("author","howpublished","title","year")),
-                )
+requiredFields = (("article",("author","title","journaltitle","year")),
+                  ("book",("author","title","year")),
+                  ("mvbook",("author","title","year")),
+                  ("inbook",("author","title","booktitle","year")),
+                  ("bookinbook",("author","title","booktitle","year")),
+                  ("suppbook",("author","title","booktitle","year")),
+                  ("booklet",("author","title","year")),
+                  ("collection",("editor","title","year")),
+                  ("mvcollection",("editor","title","year")),
+                  ("incollection",("author","editor","title","booktitle","year")),
+                  ("suppcollection",("author","editor","title","booktitle","year")),
+                  ("manual",("author","title","year")),
+                  ("misc",("author","title","year")),
+                  ("online",("author","title","year","url")),
+                  ("patent",("author","title","number","year")),
+                  ("periodical",("editor","title","year")),
+                  ("suppperiodical",("editor","title","year")),
+                  ("proceedings",("editor","title","year")),
+                  ("mvproceedings",("editor","title","year")),
+                  ("inproceedings",("author","editor","title","booktitle","year")),
+                  ("reference",("editor","title","year")),
+                  ("mvreference",("editor","title","year")),
+                  ("inreference",("author","editor","title","booktitle","year")),
+                  ("report",("author","title","type","institution","year")),
+                  ("thesis",("author","title","type","institution","year")),
+                  ("unpublished",("author","title","year")),
+                  # aliases
+                  ("conference",("author","editor","title","booktitle","year")),
+                  ("electronic",("author","title","year","url")),
+                  ("mastersthesis",("author","title","institution","year")),
+                  ("phdthesis",("author","title","institution","year")),
+                  ("techreport",("author","title","institution","year")),
+                  ("www",("author","title","year","url"))                  
+                 )
 				
 ####################################################################
 
@@ -77,7 +101,7 @@ counterNonUniqueId = 0
 removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
 for line in fIn:
-    line = line.strip("\n")
+    line = line.strip("\n").lower()
     if line.startswith("@"):
         if currentId in usedIds or not usedIds:
             for requiredFieldsType in requiredFields:
@@ -106,7 +130,7 @@ for line in fIn:
                 problem += "<li>"+subproblem+"</li>"
             problem += "</ul>"
             problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
-            problem += "<div class='bibtex_toggle'>Current BibTeX Entry</div>"
+            problem += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
             problem += "<div class='bibtex'>"+completeEntry +"</div>"
             problem += "</div>"
             problems.append(problem)
@@ -173,7 +197,7 @@ fIn.close()
 html = open(htmlOutput, 'w')
 html.write("""<html>
 <head>
-<title>BibTeX Check</title>
+<title>BibLatex Check</title>
 <style>
 body {
     font-family: Calibri, Arial, Sans;
@@ -409,7 +433,7 @@ $(document).ready(function(){
 </head>
 <body>
 <div id="title">
-<h1><a href='http://code.google.com/p/bibtex-check'>BibTeX Check</a></h1>
+<h1><a href='http://github.com/pezmc/BibLatexCheck'>BibLaTeX Check</a></h1>
 <div id="control">
 <form id="search"><input placeholder="search entry ID ..."/></form>
 <form id="mode">
