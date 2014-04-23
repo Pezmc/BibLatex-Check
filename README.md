@@ -13,7 +13,7 @@ Please note that it is not a BibLaTeX validator. And in the current version, it 
 Just copy the file into a directory with write permission, then either:
 
  * Change properties in the file to point to the bib file you want to test, and run the script with Python 3
- * Or, Specify the input on the command line `python3 biblatex_check.py <input.bib> [input.aux] [output.html]`
+ * Or, specify on the command line `python3 biblatex_check.py <input.bib> [input.aux] [output.html]`
 
 If you provide the additional aux file (usually created when compiling a tex document), then the check of the bib file is restricted to only those entries that are really cited in the tex document.
 
