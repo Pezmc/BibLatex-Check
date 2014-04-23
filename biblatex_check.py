@@ -3,7 +3,7 @@
 
 """
 BibLaTeX check on missing fields and consistent name conventions,
-especially developed for requirements in Computer Science. 
+especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow based on "
@@ -17,51 +17,51 @@ __email__ = "email<at>pezcuckow.com"
 ####################################################################
 
 # links
-citeulikeUsername = ""              # if no username is profided, no CiteULike links appear
+citeulikeUsername = ""  # if no username is profided, no CiteULike links appear
 citeulikeHref = "http://www.citeulike.org/user/"+citeulikeUsername+"/article/"
 scholarHref = "http://scholar.google.de/scholar?hl=en&q="
 googleHref = "https://www.google.de/search?q="
 dblpHref = "http://dblp.org/search/index.php#query="
 
-# fields that are required for a specific type of entry 
-requiredFields = {"article":["author","title","journaltitle","year"],
-                  "book":["author","title","year"],
-                  "mvbook":"book",
-                  "inbook":["author","title","booktitle","year"],
-                  "bookinbook":"inbook",
-                  "suppbook":"inbook",
-                  "booklet":["author","title","year"],
-                  "collection":["editor","title","year"],
-                  "mvcollection":"collection",
-                  "incollection":["author","editor","title","booktitle","year"],
+# fields that are required for a specific type of entry
+requiredFields = {"article": ["author", "title", "journaltitle", "year"],
+                  "book": ["author", "title", "year"],
+                  "mvbook": "book",
+                  "inbook": ["author", "title", "booktitle", "year"],
+                  "bookinbook": "inbook",
+                  "suppbook": "inbook",
+                  "booklet": ["author", "title", "year"],
+                  "collection": ["editor", "title", "year"],
+                  "mvcollection": "collection",
+                  "incollection": ["author", "editor", "title", "booktitle", "year"],
                   "suppcollection":"incollection",
-                  "manual":["author","title","year"],
-                  "misc":["author","title","year"],
-                  "online":["author","title","year","url"],
-                  "patent":["author","title","number","year"],
-                  "periodical":["editor","title","year"],
-                  "suppperiodical":"article",
-                  "proceedings":["editor","title","year"],
+                  "manual": ["author", "title", "year"],
+                  "misc": ["author", "title", "year"],
+                  "online": ["author", "title", "year", "url"],
+                  "patent": ["author", "title", "number", "year"],
+                  "periodical": ["editor", "title", "year"],
+                  "suppperiodical": "article",
+                  "proceedings": ["editor", "title", "year"],
                   "mvproceedings":"proceedings",
-                  "inproceedings":["author","editor","title","booktitle","year"],
-                  "reference":"collection",
-                  "mvreference":"collection",
-                  "inreference":"incollection",
-                  "report":["author","title","type","institution","year"],
-                  "thesis":["author","title","type","institution","year"],
-                  "unpublished":["author","title","year"],
-                  
+                  "inproceedings": ["author", "editor", "title", "booktitle", "year"],
+                  "reference": "collection",
+                  "mvreference": "collection",
+                  "inreference": "incollection",
+                  "report": ["author", "title", "type", "institution", "year"],
+                  "thesis": ["author", "title", "type", "institution", "year"],
+                  "unpublished": ["author", "title", "year"],
+
                   # semi aliases (differing fields)
-                  "mastersthesis":["author","title","institution","year"],
-                  "techreport":["author","title","institution","year"],
-                  
+                  "mastersthesis": ["author", "title", "institution", "year"],
+                  "techreport": ["author", "title", "institution", "year"],
+               
                   # other aliases
                   "conference":"inproceedings",
                   "electronic":"online",
                   "phdthesis":"mastersthesis",
                   "www":"online"                 
                  }
-				
+			
 ####################################################################
 
 import string
@@ -69,7 +69,8 @@ import re
 import sys
 from optparse import OptionParser
 
-usage = "biblatex_check.py.py [-h|--help] [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>]"
+# Parse options
+usage = sys.args[0] + " [-h|--help] [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>]"
 
 parser = OptionParser(usage=usage)
 
@@ -77,7 +78,7 @@ parser.add_option("-b", "--bib", dest="bibFile",
                   help="Bib File", metavar="input.bib", default="references.bib")
 
 parser.add_option("-a", "--aux", dest="auxFile",
-                  help="Aux File", metavar="input.aux", default="input.aux")
+                  help="Aux File", metavar="input.aux", default="references.aux")
 
 parser.add_option("-o", "--output", dest="htmlOutput",
                   help="HTML Output File", metavar="output.html", default="biblatex_check.html")
@@ -88,14 +89,14 @@ auxFile = options.auxFile
 bibFile = options.bibFile
 htmlOutput = options.htmlOutput
 
-
+# ID's that have been observed
 usedIds = set()
 
 try: 
     fInAux = open(auxFile, 'r', encoding="utf8")
     for line in fInAux:
         if line.startswith("\\citation"):
-            ids = line.split("{")[1].rstrip("} \n").split(",")
+            ids = line.split("{")[1].rstrip("} \n").split(", ")
             for id in ids:
                 if (id != ""):
                     usedIds.add(id)
