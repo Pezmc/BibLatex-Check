@@ -96,12 +96,12 @@ try:
                     usedIds.add(id)
     fInAux.close()
 except IOError as e:
-    print("No aux file '"+auxFile+"' exists -> do not restrict entities")
+    print ("WARNING: No aux file '"+auxFile+"' exists -> do not restrict entities")
 
 try:
   fIn = open(bibFile, 'r', encoding="utf8")
 except IOError as e:
-    print("Input bib file '"+bibFile+"' doesn't exist or is not readable")
+    print("ERROR: Input bib file '"+bibFile+"' doesn't exist or is not readable")
     sys.exit()
     
 completeEntry = ""
