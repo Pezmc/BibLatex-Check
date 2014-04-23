@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/local/bin/python3
+
 
 """
 BibLaTeX check on missing fields and consistent name conventions,
@@ -14,12 +15,6 @@ __email__ = "email<at>pezcuckow.com"
 ####################################################################
 # Properties (please change according to your needs)
 ####################################################################
-
-## Script falls back on these if not specified on the command line
-# files
-bibFile = "references.bib"  
-auxFile = ""                # use "" to deactivate restricting the check to the entries listed in the aux file
-htmlOutput = "biblatex_check.html"
 
 # links
 citeulikeUsername = ""              # if no username is profided, no CiteULike links appear
@@ -63,25 +58,32 @@ requiredFields = (("article",("author","title","journaltitle","year")),
                   ("techreport",("author","title","institution","year")),
                   ("www",("author","title","year","url"))                  
                  )
-				
+  			
 ####################################################################
 
 import string
 import re
 import sys
+from optparse import OptionParser
 
-if len(sys.argv) > 1:
-  if len(sys.argv) >= 2:
-    bibFile = sys.argv[1]
-    
-  if len(sys.argv) >= 3:
-    auxFile = sys.argv[2]
-    
-  if len(sys.argv) >= 4:
-    htmlOutput = sys.argv[3]
-    
-  if len(sys.argv) < 2 or len(sys.argv) > 4:
-    print("Usage: " +sys.argv[0]+ " <input.bib> [input.aux] [output.html]")
+usage = "biblatex_check.py.py [-h|--help] [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>]"
+
+parser = OptionParser(usage=usage)
+
+parser.add_option("-b", "--bib", dest="bibFile",
+                  help="Bib File", metavar="input.bib", default="references.bib")
+
+parser.add_option("-a", "--aux", dest="auxFile",
+                  help="Aux File", metavar="input.aux", default="input.aux")
+
+parser.add_option("-o", "--output", dest="htmlOutput",
+                  help="HTML Output File", metavar="output.html", default="biblatex_check.html")
+                
+(options, args) = parser.parse_args()
+
+auxFile = options.auxFile
+bibFile = options.bibFile
+htmlOutput = options.htmlOutput
 
 
 usedIds = set()
