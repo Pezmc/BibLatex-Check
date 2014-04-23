@@ -124,11 +124,12 @@ counterMissingFields = 0
 counterFlawedNames = 0
 counterWrongTypes = 0
 counterNonUniqueId = 0
+counterWrongFieldNames = 0
 
 removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
 for line in fIn:
-    line = line.strip("\n").lower() #biblatex is not case sensitive
+    line = line.strip("\n")
     if line.startswith("@"):
         if currentId in usedIds or not usedIds:
             for fieldName, requiredFieldsType in requiredFields.items():
@@ -188,7 +189,7 @@ for line in fIn:
             completeEntry += line + "<br />"
         if currentId in usedIds or not usedIds:
             if "=" in line:
-                field = line.split("=")[0].strip()
+                field = line.split("=")[0].strip().lower() #biblatex is not case sensitive
                 fields.append(field)
                 value = line.split("=")[1].strip("{} ,\n")
                 if field == "author":
