@@ -10,14 +10,20 @@ Please note that it is not a BibLaTeX validator. And in the current version, it 
 
 ##Getting Started
 
-Just copy the file into a directory with write permission, then either:
+Just copy the file into a directory with write permission, then run the script
 
- * Change properties in the file to point to the bib file you want to test, and run the script with Python 3
- * Or, specify on the command line `python3 biblatex_check.py <input.bib> [input.aux] [output.html]`
+	./biblatex_check.py <input.bib> [input.aux] [output.html]
+	
+`
 
 If you provide the additional aux file (usually created when compiling a tex document), then the check of the bib file is restricted to only those entries that are really cited in the tex document.
 
 The html output is tested with Firefox and Chrome, but the current version does not properly work with Internet Explorer.
+
+##Help
+See `./biblatex_check.py -h` for basic help.
+
+If your getting an environment error, try using `python ./biblatex_check.py` or `python3 ./biblatex_check.py` depending on your OS.
 
 ##Screenshot
 ![Screenshots of the BibLatex check screen](/../screenshots/screenshots/checkscreen.png?raw=true "BibLatex Check")
