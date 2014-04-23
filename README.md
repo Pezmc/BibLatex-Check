@@ -19,4 +19,4 @@ The html output is tested with Firefox and Chrome, but the current version does 
 
 Screenshot
 ===
-Pending
+![Screenshots of the BibLatex check screen](/../screenshots/screenshots/checkscreen.png?raw=true "BibLatex Check")
