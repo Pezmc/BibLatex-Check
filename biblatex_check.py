@@ -113,6 +113,7 @@ except IOError as e:
     print("ERROR: Input bib file '"+bibFile+"' doesn't exist or is not readable")
     sys.exit()
     
+# Go through and check all referneces    
 completeEntry = ""
 currentId = ""
 ids = []
@@ -243,6 +244,7 @@ for line in fIn:
                  
 fIn.close()
 
+# Write out our HTML file
 html = open(htmlOutput, 'w')
 html.write("""<html>
 <head>
