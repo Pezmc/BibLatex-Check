@@ -37,7 +37,7 @@ requiredFields = {"article": ["author", "title", "journaltitle", "year"],
                   "suppcollection":"incollection",
                   "manual": ["author", "title", "year"],
                   "misc": ["author", "title", "year"],
-                  "online": ["author", "title", "year", "url"],
+                  "online": ["author/editor", "title", "year/date", "url"],
                   "patent": ["author", "title", "number", "year"],
                   "periodical": ["editor", "title", "year"],
                   "suppperiodical": "article",
@@ -132,18 +132,25 @@ for line in fIn:
     if line.startswith("@"):
         if currentId in usedIds or not usedIds:
             for fieldName, requiredFieldsType in requiredFields.items():
+              
                 if fieldName == currentType:
-                  if isinstance(requiredFieldsType, str):
-                    currentrequiredFields = requiredFields[fieldName]
-                  else:
-                    currentrequiredFields = requiredFieldsType
-                  
-                  for field in currentrequiredFields:
-                      if field not in fields:
-                          subproblems.append("missing field '"+field+"'")
-                          counterMissingFields += 1
+                    if isinstance(requiredFieldsType, str):
+                      currentrequiredFields = requiredFields[fieldName]
+                    else:
+                      currentrequiredFields = requiredFieldsType
+                    
+                    for requiredFieldsString in currentrequiredFields:
+                    
+                        # support for author/editor syntax
+                        typeFields = requiredFieldsString.split('/')
+                                
+                        # at least one these required fields is not found
+                        if set(typeFields).isdisjoint(fields):
+                            subproblems.append("missing field '"+requiredFieldsString+"'")
+                            counterMissingFields += 1
         else:
             subproblems = []
+            
         if currentId in usedIds or (currentId and not usedIds):
             cleanedTitle = currentTitle.translate(removePunctuationMap)
             problem = "<div id='"+currentId+"' class='problem severe"+str(len(subproblems))+"'>"
