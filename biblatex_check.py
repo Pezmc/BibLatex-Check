@@ -210,10 +210,16 @@ for line in fIn:
                     counterWrongTypes += 1
 
                 # check if abbreviations are used in journal titles
-                if currentType == "article" and field == "journal":
+                if currentType == "article" and (field == "journal" or field == "journaltitle"):
+                    
+                    if field == "journal":
+                        subproblems.append("wrong field: biblatex uses journaltitle, journal")
+                        counterWrongFieldNames += 1
+                
                     if "." in line:
                         subproblems.append("flawed name: abbreviated journal title '"+value+"'")
                         counterFlawedNames += 1
+                     
 
                 # check booktitle format; expected format "ICBAB '13: Proceeding of the 13th International Conference on Bla and Blubb"
                 #if currentType == "inproceedings" and field == "booktitle":
@@ -503,6 +509,7 @@ html.write("<li># missing fields: "+str(counterMissingFields)+"</li>")
 html.write("<li># flawed names: "+str(counterFlawedNames)+"</li>")
 html.write("<li># wrong types: "+str(counterWrongTypes)+"</li>")
 html.write("<li># non-unique id: "+str(counterNonUniqueId)+"</li>")
+html.write("<li># wrong field: "+str(counterWrongFieldNames)+"</li>")
 html.write("</ul></ul></div>")
 
 problems.sort()
