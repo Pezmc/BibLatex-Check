@@ -1,13 +1,12 @@
-#!/usr/local/bin/python3
-
+#!/usr/bin/env python
 
 """
 BibLaTeX check on missing fields and consistent name conventions,
 especially developed for requirements in Computer Science.
 """
 
-__author__ = "Pez Cuckow based on "
-__version__ = "0.0.3"
+__author__ = "Pez Cuckow"
+__version__ = "0.1.0"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
@@ -70,7 +69,7 @@ import sys
 from optparse import OptionParser
 
 # Parse options
-usage = sys.argv[0] + " [-h|--help] [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>]"
+usage = sys.argv[0] + " [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>] [-h|--help]"
 
 parser = OptionParser(usage=usage)
 
@@ -89,9 +88,13 @@ auxFile = options.auxFile
 bibFile = options.bibFile
 htmlOutput = options.htmlOutput
 
-# ID's that have been observed
-usedIds = set()
+# Enforce python 3 or above
+if sys.version_info[0] < 3:
+    print("This script requires Python version 3, try python3 ./" + sys.argv[0])
+    sys.exit(1)
 
+# Find used refernece ID's only
+usedIds = set()
 try: 
     fInAux = open(auxFile, 'r', encoding="utf8")
     for line in fInAux:
