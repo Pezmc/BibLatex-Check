@@ -6,7 +6,7 @@ especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
@@ -21,6 +21,7 @@ citeulikeHref = "http://www.citeulike.org/user/"+citeulikeUsername+"/article/"
 scholarHref = "http://scholar.google.de/scholar?hl=en&q="
 googleHref = "https://www.google.de/search?q="
 dblpHref = "http://dblp.org/search/index.php#query="
+ieeeHref = "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="
 
 # fields that are required for a specific type of entry
 requiredFields = {"article": ["author", "title", "journaltitle", "year/date"],
@@ -165,7 +166,8 @@ for line in fIn:
                 problem += "<a href='"+citeulikeHref+currentArticleId+"' target='_blank'>CiteULike</a> |"
             problem += " <a href='"+scholarHref+cleanedTitle+"' target='_blank'>Scholar</a> |"
             problem += " <a href='"+googleHref+cleanedTitle+"' target='_blank'>Google</a> |"
-            problem += " <a href='"+dblpHref+cleanedTitle+"' target='_blank'>DBLP</a>"
+            problem += " <a href='"+dblpHref+cleanedTitle+"' target='_blank'>DBLP</a> |"
+            problem += " <a href='"+ieeeHref+cleanedTitle+"' target='_blank'>IEEE</a>"
             problem += "</div>"
             problem += "<div class='reference'>"+currentTitle
             problem += "</div>"
