@@ -70,7 +70,7 @@ import sys
 from optparse import OptionParser
 
 # Parse options
-usage = sys.args[0] + " [-h|--help] [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>]"
+usage = sys.argv[0] + " [-h|--help] [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>]"
 
 parser = OptionParser(usage=usage)
 
@@ -102,7 +102,7 @@ try:
                     usedIds.add(id)
     fInAux.close()
 except IOError as e:
-    print ("WARNING: No aux file '"+auxFile+"' exists -> do not restrict entities")
+    print ("WARNING: Aux file '"+auxFile+"' doesn't exist -> not restricting entries")
 
 try:
   fIn = open(bibFile, 'r', encoding="utf8")
