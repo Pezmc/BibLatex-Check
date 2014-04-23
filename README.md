@@ -1,6 +1,6 @@
 BibLatex-Check
 ==============
-A python3 script for checking BibLatex .bib files
+*A python3 script for checking BibLatex .bib files*
 
 BibTeX Check is a small Python script that goes through a list of references and checks if certain required fields are available, for instance, if each publication is assigned a year or if a journal article has a volume and issue number.
 Moreover, it allows for first consistency checks of names of conference proceedings and you can easily extend it to support further of such checks. The results are printed to an html file, which includes links to Google Scholar, DBLP, etc. for each flawed reference.
