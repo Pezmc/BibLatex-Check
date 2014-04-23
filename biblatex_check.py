@@ -162,10 +162,10 @@ for line in fIn:
             problem += "<h2>"+currentId+" ("+currentType+")</h2> "
             problem += "<div class='links'>"
             if citeulikeUsername:
-                problem += "<a href='"+citeulikeHref+currentArticleId+"'>CiteULike</a>"
-            problem += " | <a href='"+scholarHref+cleanedTitle+"'>Scholar</a>"
-            problem += " | <a href='"+googleHref+cleanedTitle+"'>Google</a>"
-            problem += " | <a href='"+dblpHref+cleanedTitle+"'>DBLP</a>"
+                problem += "<a href='"+citeulikeHref+currentArticleId+"' target='_blank'>CiteULike</a> |"
+            problem += " <a href='"+scholarHref+cleanedTitle+"' target='_blank'>Scholar</a> |"
+            problem += " <a href='"+googleHref+cleanedTitle+"' target='_blank'>Google</a> |"
+            problem += " <a href='"+dblpHref+cleanedTitle+"' target='_blank'>DBLP</a>"
             problem += "</div>"
             problem += "<div class='reference'>"+currentTitle
             problem += "</div>"
