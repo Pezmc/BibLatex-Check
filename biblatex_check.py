@@ -29,40 +29,43 @@ googleHref = "https://www.google.de/search?q="
 dblpHref = "http://dblp.org/search/index.php#query="
 
 # fields that are required for a specific type of entry 
-requiredFields = (("article",("author","title","journaltitle","year")),
-                  ("book",("author","title","year")),
-                  ("mvbook",("author","title","year")),
-                  ("inbook",("author","title","booktitle","year")),
-                  ("bookinbook",("author","title","booktitle","year")),
-                  ("suppbook",("author","title","booktitle","year")),
-                  ("booklet",("author","title","year")),
-                  ("collection",("editor","title","year")),
-                  ("mvcollection",("editor","title","year")),
-                  ("incollection",("author","editor","title","booktitle","year")),
-                  ("suppcollection",("author","editor","title","booktitle","year")),
-                  ("manual",("author","title","year")),
-                  ("misc",("author","title","year")),
-                  ("online",("author","title","year","url")),
-                  ("patent",("author","title","number","year")),
-                  ("periodical",("editor","title","year")),
-                  ("suppperiodical",("editor","title","year")),
-                  ("proceedings",("editor","title","year")),
-                  ("mvproceedings",("editor","title","year")),
-                  ("inproceedings",("author","editor","title","booktitle","year")),
-                  ("reference",("editor","title","year")),
-                  ("mvreference",("editor","title","year")),
-                  ("inreference",("author","editor","title","booktitle","year")),
-                  ("report",("author","title","type","institution","year")),
-                  ("thesis",("author","title","type","institution","year")),
-                  ("unpublished",("author","title","year")),
-                  # aliases
-                  ("conference",("author","editor","title","booktitle","year")),
-                  ("electronic",("author","title","year","url")),
-                  ("mastersthesis",("author","title","institution","year")),
-                  ("phdthesis",("author","title","institution","year")),
-                  ("techreport",("author","title","institution","year")),
-                  ("www",("author","title","year","url"))                  
-                 )
+requiredFields = {"article":["author","title","journaltitle","year"],
+                  "book":["author","title","year"],
+                  "mvbook":"book",
+                  "inbook":["author","title","booktitle","year"],
+                  "bookinbook":"inbook",
+                  "suppbook":"inbook",
+                  "booklet":["author","title","year"],
+                  "collection":["editor","title","year"],
+                  "mvcollection":"collection",
+                  "incollection":["author","editor","title","booktitle","year"],
+                  "suppcollection":"incollection",
+                  "manual":["author","title","year"],
+                  "misc":["author","title","year"],
+                  "online":["author","title","year","url"],
+                  "patent":["author","title","number","year"],
+                  "periodical":["editor","title","year"],
+                  "suppperiodical":"article",
+                  "proceedings":["editor","title","year"],
+                  "mvproceedings":"proceedings",
+                  "inproceedings":["author","editor","title","booktitle","year"],
+                  "reference":"collection",
+                  "mvreference":"collection",
+                  "inreference":"incollection",
+                  "report":["author","title","type","institution","year"],
+                  "thesis":["author","title","type","institution","year"],
+                  "unpublished":["author","title","year"],
+                  
+                  # semi aliases (differing fields)
+                  "mastersthesis":["author","title","institution","year"],
+                  "techreport":["author","title","institution","year"],
+                  
+                  # other aliases
+                  "conference":"inproceedings",
+                  "electronic":"online",
+                  "phdthesis":"mastersthesis",
+                  "www":"online"                 
+                 }
 				
 ####################################################################
 
@@ -125,12 +128,17 @@ for line in fIn:
     line = line.strip("\n").lower() #biblatex is not case sensitive
     if line.startswith("@"):
         if currentId in usedIds or not usedIds:
-            for requiredFieldsType in requiredFields:
-                if requiredFieldsType[0] == currentType:
-                    for field in requiredFieldsType[1]:
-                        if field not in fields:
-                            subproblems.append("missing field '"+field+"'")
-                            counterMissingFields += 1
+            for fieldName, requiredFieldsType in requiredFields.items():
+                if fieldName == currentType:
+                  if isinstance(requiredFieldsType, str):
+                    currentrequiredFields = requiredFields[fieldName]
+                  else:
+                    currentrequiredFields = requiredFieldsType
+                  
+                  for field in currentrequiredFields:
+                      if field not in fields:
+                          subproblems.append("missing field '"+field+"'")
+                          counterMissingFields += 1
         else:
             subproblems = []
         if currentId in usedIds or (currentId and not usedIds):
