@@ -479,7 +479,7 @@ $(document).ready(function(){
 </head>
 <body>
 <div id="title">
-<h1><a href='http://github.com/pezmc/BibLatexCheck'>BibLaTeX Check</a></h1>
+<h1><a href='http://github.com/pezmc/BibLatex-Check'>BibLaTeX Check</a></h1>
 <div id="control">
 <form id="search"><input placeholder="search entry ID ..."/></form>
 <form id="mode">
