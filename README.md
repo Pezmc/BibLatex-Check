@@ -13,10 +13,8 @@ Please note that it is not a BibLaTeX validator. And in the current version, it 
 Just copy the file into a directory with write permission, then run the script
 
 	./biblatex_check.py <input.bib> [input.aux] [output.html]
-	
-`
 
-If you provide the additional aux file (usually created when compiling a tex document), then the check of the bib file is restricted to only those entries that are really cited in the tex document.
+If you provide the additional aux file (created when compiling a tex document), the bib check is restricted entries that are really cited in the tex document.
 
 The html output is tested with Firefox and Chrome, but the current version does not properly work with Internet Explorer.
 
@@ -25,14 +23,14 @@ See `./biblatex_check.py -h` for basic help.
 
 If your getting an environment error, try using `python ./biblatex_check.py` or `python3 ./biblatex_check.py` depending on your OS.
 
+##Alternatives
+BibLatex check is adapted from [BibTex Check](https://code.google.com/p/bibtex-check/) by Fabian Beck, which can be used to validate BibTex files.
+
+See [BibTex vs BibLaTex vs NatBib](http://tex.stackexchange.com/questions/25701/bibtex-vs-biber-and-biblatex-vs-natbib) for a comparison of different referencing packages.
+
 ##Screenshot
 ![Screenshots of the BibLatex check screen](/../screenshots/screenshots/checkscreen.png?raw=true "BibLatex Check")
 
 ##License
 MIT license
-
-##Alternatives
-BibLatex check is adapted from [BibTex Check](https://code.google.com/p/bibtex-check/) by Fabian Beck, which can be used to validate BibTex files.
-
-See [BibTex vs BibLaTex vs NatBib](http://tex.stackexchange.com/questions/25701/bibtex-vs-biber-and-biblatex-vs-natbib) for a comparison of different referencing packages.
 
