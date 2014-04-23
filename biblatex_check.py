@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 BibLaTeX check on missing fields and consistent name conventions,
@@ -6,7 +6,7 @@ especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow based on "
-__version__ = "0.0.1"
+__version__ = "0.0.3"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
@@ -15,8 +15,9 @@ __email__ = "email<at>pezcuckow.com"
 # Properties (please change according to your needs)
 ####################################################################
 
+## Script falls back on these if not specified on the command line
 # files
-bibFile = "references.bib"
+bibFile = "references.bib"  
 auxFile = ""                # use "" to deactivate restricting the check to the entries listed in the aux file
 htmlOutput = "biblatex_check.html"
 
@@ -67,6 +68,21 @@ requiredFields = (("article",("author","title","journaltitle","year")),
 
 import string
 import re
+import sys
+
+if len(sys.argv) > 1:
+  if len(sys.argv) >= 2:
+    bibFile = sys.argv[1]
+    
+  if len(sys.argv) >= 3:
+    auxFile = sys.argv[2]
+    
+  if len(sys.argv) >= 4:
+    htmlOutput = sys.argv[3]
+    
+  if len(sys.argv) < 2 or len(sys.argv) > 4:
+    print("Usage: " +sys.argv[0]+ " <input.bib> [input.aux] [output.html]")
+
 
 usedIds = set()
 
@@ -80,9 +96,14 @@ try:
                     usedIds.add(id)
     fInAux.close()
 except IOError as e:
-    print("no aux file '"+auxFile+"' exists -> do not restrict entities")
+    print("No aux file '"+auxFile+"' exists -> do not restrict entities")
 
-fIn = open(bibFile, 'r', encoding="utf8")
+try:
+  fIn = open(bibFile, 'r', encoding="utf8")
+except IOError as e:
+    print("Input bib file '"+bibFile+"' doesn't exist or is not readable")
+    sys.exit()
+    
 completeEntry = ""
 currentId = ""
 ids = []
@@ -101,7 +122,7 @@ counterNonUniqueId = 0
 removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
 for line in fIn:
-    line = line.strip("\n").lower()
+    line = line.strip("\n").lower() #biblatex is not case sensitive
     if line.startswith("@"):
         if currentId in usedIds or not usedIds:
             for requiredFieldsType in requiredFields:
