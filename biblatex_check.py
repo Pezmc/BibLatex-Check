@@ -6,7 +6,7 @@ especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow"
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
@@ -18,10 +18,14 @@ __email__ = "email<at>pezcuckow.com"
 # links
 citeulikeUsername = ""  # if no username is profided, no CiteULike links appear
 citeulikeHref = "http://www.citeulike.org/user/"+citeulikeUsername+"/article/"
-scholarHref = "http://scholar.google.de/scholar?hl=en&q="
-googleHref = "https://www.google.de/search?q="
-dblpHref = "http://dblp.org/search/index.php#query="
-ieeeHref = "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="
+
+libraries = [    ("Scholar", "http://scholar.google.de/scholar?hl=en&q="),
+  	         ("Google", "https://www.google.com/search?q="),
+		 ("DBLP", "http://dblp.org/search/index.php#query="),
+		 ("IEEE", "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="),
+		 ("ACM", "http://dl.acm.org/results.cfm?within="),
+	    ]
+		 
 
 # fields that are required for a specific type of entry
 requiredFields = {"article": ["author", "title", "journaltitle", "year/date"],
@@ -164,10 +168,13 @@ for line in fIn:
             problem += "<div class='links'>"
             if citeulikeUsername:
                 problem += "<a href='"+citeulikeHref+currentArticleId+"' target='_blank'>CiteULike</a> |"
-            problem += " <a href='"+scholarHref+cleanedTitle+"' target='_blank'>Scholar</a> |"
-            problem += " <a href='"+googleHref+cleanedTitle+"' target='_blank'>Google</a> |"
-            problem += " <a href='"+dblpHref+cleanedTitle+"' target='_blank'>DBLP</a> |"
-            problem += " <a href='"+ieeeHref+cleanedTitle+"' target='_blank'>IEEE</a>"
+                
+            list = []
+            for name, site in libraries:
+            	list.append(" <a href='"+site+cleanedTitle+"' target='_blank'>"+name+"</a>")
+            problem += " | ".join(list)
+            
+
             problem += "</div>"
             problem += "<div class='reference'>"+currentTitle
             problem += "</div>"
