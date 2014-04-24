@@ -23,9 +23,8 @@ citeulikeHref = "http://www.citeulike.org/user/" + \
 libraries = [("Scholar", "http://scholar.google.de/scholar?hl=en&q="),
              ("Google", "https://www.google.com/search?q="),
              ("DBLP", "http://dblp.org/search/index.php#query="),
-             ("IEEE",
-              "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="),
-             ("ACM", "http://dl.acm.org/results.cfm?within=xxx"),
+             ("IEEE", "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="),
+             ("ACM", "http://dl.acm.org/results.cfm?within="),
              ]
 
 
@@ -526,12 +525,13 @@ $(document).ready(function(){
 </div>
 </div>
 """)
+problemCount = counterMissingFields + counterFlawedNames + counterWrongFieldNames + \
+               counterWrongTypes + counterNonUniqueId
 html.write("<div class='info'><h2>Info</h2><ul>")
 html.write("<li>bib file: " + bibFile + "</li>")
 html.write("<li>aux file: " + auxFile + "</li>")
 html.write("<li># entries: " + str(len(problems)) + "</li>")
-html.write("<li># problems: " + str(counterMissingFields +
-                                    counterFlawedNames + counterWrongTypes + counterNonUniqueId) + "</li><ul>")
+html.write("<li># problems: " + str(problemCount) + "</li><ul>")
 html.write("<li># missing fields: " + str(counterMissingFields) + "</li>")
 html.write("<li># flawed names: " + str(counterFlawedNames) + "</li>")
 html.write("<li># wrong types: " + str(counterWrongTypes) + "</li>")
