@@ -237,7 +237,7 @@ for line in fIn:
 
                     if field == "journal":
                         subproblems.append(
-                            "wrong field: biblatex uses journaltitle, journal")
+                            "wrong field: biblatex uses journaltitle, not journal")
                         counterWrongFieldNames += 1
 
                     if "." in line:
