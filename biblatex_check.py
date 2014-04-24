@@ -6,7 +6,7 @@ especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow"
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
@@ -17,11 +17,17 @@ __email__ = "email<at>pezcuckow.com"
 
 # links
 citeulikeUsername = ""  # if no username is profided, no CiteULike links appear
-citeulikeHref = "http://www.citeulike.org/user/"+citeulikeUsername+"/article/"
-scholarHref = "http://scholar.google.de/scholar?hl=en&q="
-googleHref = "https://www.google.de/search?q="
-dblpHref = "http://dblp.org/search/index.php#query="
-ieeeHref = "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="
+citeulikeHref = "http://www.citeulike.org/user/" + \
+    citeulikeUsername + "/article/"
+
+libraries = [("Scholar", "http://scholar.google.de/scholar?hl=en&q="),
+             ("Google", "https://www.google.com/search?q="),
+             ("DBLP", "http://dblp.org/search/index.php#query="),
+             ("IEEE",
+              "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="),
+             ("ACM", "http://dl.acm.org/results.cfm?within=xxx"),
+             ]
+
 
 # fields that are required for a specific type of entry
 requiredFields = {"article": ["author", "title", "journaltitle", "year/date"],
@@ -34,7 +40,7 @@ requiredFields = {"article": ["author", "title", "journaltitle", "year/date"],
                   "collection": ["editor", "title", "year/date"],
                   "mvcollection": "collection",
                   "incollection": ["author", "editor", "title", "booktitle", "year/date"],
-                  "suppcollection":"incollection",
+                  "suppcollection": "incollection",
                   "manual": ["author/editor", "title", "year/date"],
                   "misc": ["author/editor", "title", "year/date"],
                   "online": ["author/editor", "title", "year/date", "url"],
@@ -42,7 +48,7 @@ requiredFields = {"article": ["author", "title", "journaltitle", "year/date"],
                   "periodical": ["editor", "title", "year/date"],
                   "suppperiodical": "article",
                   "proceedings": ["editor", "title", "year/date"],
-                  "mvproceedings":"proceedings",
+                  "mvproceedings": "proceedings",
                   "inproceedings": ["author", "editor", "title", "booktitle", "year/date"],
                   "reference": "collection",
                   "mvreference": "collection",
@@ -54,14 +60,14 @@ requiredFields = {"article": ["author", "title", "journaltitle", "year/date"],
                   # semi aliases (differing fields)
                   "mastersthesis": ["author", "title", "institution", "year/date"],
                   "techreport": ["author", "title", "institution", "year/date"],
-               
+
                   # other aliases
-                  "conference":"inproceedings",
-                  "electronic":"online",
-                  "phdthesis":"mastersthesis",
-                  "www":"online"                 
-                 }
-			
+                  "conference": "inproceedings",
+                  "electronic": "online",
+                  "phdthesis": "mastersthesis",
+                  "www": "online"
+                  }
+
 ####################################################################
 
 import string
@@ -70,7 +76,8 @@ import sys
 from optparse import OptionParser
 
 # Parse options
-usage = sys.argv[0] + " [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>] [-h|--help]"
+usage = sys.argv[
+    0] + " [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>] [-h|--help]"
 
 parser = OptionParser(usage=usage)
 
@@ -82,7 +89,7 @@ parser.add_option("-a", "--aux", dest="auxFile",
 
 parser.add_option("-o", "--output", dest="htmlOutput",
                   help="HTML Output File", metavar="output.html", default="biblatex_check.html")
-                
+
 (options, args) = parser.parse_args()
 
 auxFile = options.auxFile
@@ -91,12 +98,13 @@ htmlOutput = options.htmlOutput
 
 # Enforce python 3 or above
 if sys.version_info[0] < 3:
-    print("This script requires Python version 3, try python3 ./" + sys.argv[0])
+    print(
+        "This script requires Python version 3, try python3 ./" + sys.argv[0])
     sys.exit(1)
 
 # Find used refernece ID's only
 usedIds = set()
-try: 
+try:
     fInAux = open(auxFile, 'r', encoding="utf8")
     for line in fInAux:
         if line.startswith("\\citation"):
@@ -106,15 +114,17 @@ try:
                     usedIds.add(id)
     fInAux.close()
 except IOError as e:
-    print ("WARNING: Aux file '"+auxFile+"' doesn't exist -> not restricting entries")
+    print ("WARNING: Aux file '" + auxFile +
+           "' doesn't exist -> not restricting entries")
 
 try:
-  fIn = open(bibFile, 'r', encoding="utf8")
+    fIn = open(bibFile, 'r', encoding="utf8")
 except IOError as e:
-    print("ERROR: Input bib file '"+bibFile+"' doesn't exist or is not readable")
+    print("ERROR: Input bib file '" + bibFile +
+          "' doesn't exist or is not readable")
     sys.exit()
-    
-# Go through and check all referneces    
+
+# Go through and check all referneces
 completeEntry = ""
 currentId = ""
 ids = []
@@ -138,53 +148,59 @@ for line in fIn:
     if line.startswith("@"):
         if currentId in usedIds or not usedIds:
             for fieldName, requiredFieldsType in requiredFields.items():
-              
+
                 if fieldName == currentType:
                     if isinstance(requiredFieldsType, str):
-                      currentrequiredFields = requiredFields[fieldName]
+                        currentrequiredFields = requiredFields[fieldName]
                     else:
-                      currentrequiredFields = requiredFieldsType
-                    
+                        currentrequiredFields = requiredFieldsType
+
                     for requiredFieldsString in currentrequiredFields:
-                    
+
                         # support for author/editor syntax
                         typeFields = requiredFieldsString.split('/')
-                                
+
                         # at least one these required fields is not found
                         if set(typeFields).isdisjoint(fields):
-                            subproblems.append("missing field '"+requiredFieldsString+"'")
+                            subproblems.append(
+                                "missing field '" + requiredFieldsString + "'")
                             counterMissingFields += 1
         else:
             subproblems = []
-            
+
         if currentId in usedIds or (currentId and not usedIds):
             cleanedTitle = currentTitle.translate(removePunctuationMap)
-            problem = "<div id='"+currentId+"' class='problem severe"+str(len(subproblems))+"'>"
-            problem += "<h2>"+currentId+" ("+currentType+")</h2> "
+            problem = "<div id='" + currentId + \
+                "' class='problem severe" + str(len(subproblems)) + "'>"
+            problem += "<h2>" + currentId + " (" + currentType + ")</h2> "
             problem += "<div class='links'>"
             if citeulikeUsername:
-                problem += "<a href='"+citeulikeHref+currentArticleId+"' target='_blank'>CiteULike</a> |"
-            problem += " <a href='"+scholarHref+cleanedTitle+"' target='_blank'>Scholar</a> |"
-            problem += " <a href='"+googleHref+cleanedTitle+"' target='_blank'>Google</a> |"
-            problem += " <a href='"+dblpHref+cleanedTitle+"' target='_blank'>DBLP</a> |"
-            problem += " <a href='"+ieeeHref+cleanedTitle+"' target='_blank'>IEEE</a>"
+                problem += "<a href='" + citeulikeHref + \
+                    currentArticleId + "' target='_blank'>CiteULike</a> |"
+
+            list = []
+            for name, site in libraries:
+                list.append(
+                    " <a href='" + site + cleanedTitle + "' target='_blank'>" + name + "</a>")
+            problem += " | ".join(list)
+
             problem += "</div>"
-            problem += "<div class='reference'>"+currentTitle
+            problem += "<div class='reference'>" + currentTitle
             problem += "</div>"
             problem += "<ul>"
             for subproblem in subproblems:
-                problem += "<li>"+subproblem+"</li>"
+                problem += "<li>" + subproblem + "</li>"
             problem += "</ul>"
             problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
             problem += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
-            problem += "<div class='bibtex'>"+completeEntry +"</div>"
+            problem += "<div class='bibtex'>" + completeEntry + "</div>"
             problem += "</div>"
             problems.append(problem)
         fields = []
         subproblems = []
         currentId = line.split("{")[1].rstrip(",\n")
         if currentId in ids:
-            subproblems.append("non-unique id: '"+currentId+"'")
+            subproblems.append("non-unique id: '" + currentId + "'")
             counterNonUniqueId += 1
         else:
             ids.append(currentId)
@@ -195,55 +211,58 @@ for line in fIn:
             completeEntry += line + "<br />"
         if currentId in usedIds or not usedIds:
             if "=" in line:
-                field = line.split("=")[0].strip().lower() #biblatex is not case sensitive
+                # biblatex is not case sensitive
+                field = line.split("=")[0].strip().lower()
                 fields.append(field)
                 value = line.split("=")[1].strip("{} ,\n")
                 if field == "author":
-                    currentAuthor = filter(lambda x: not (x in "\\\"{}"), value.split(" and ")[0])
+                    currentAuthor = filter(
+                        lambda x: not (x in "\\\"{}"), value.split(" and ")[0])
                 if field == "citeulike-article-id":
                     currentArticleId = value
                 if field == "title":
-                    currentTitle = re.sub(r'\}|\{',r'',value)
+                    currentTitle = re.sub(r'\}|\{', r'', value)
 
-                ####################################################################
+                ###############################################################
                 # Checks (please (de)activate/extend to your needs)
-                ####################################################################
+                ###############################################################
 
-                    
                 # check if type 'proceedings' might be 'inproceedings'
                 if currentType == "proceedings" and field == "pages":
-                    subproblems.append("wrong type: maybe should be 'inproceedings' because entry has page numbers")
+                    subproblems.append(
+                        "wrong type: maybe should be 'inproceedings' because entry has page numbers")
                     counterWrongTypes += 1
 
                 # check if abbreviations are used in journal titles
                 if currentType == "article" and (field == "journal" or field == "journaltitle"):
-                    
+
                     if field == "journal":
-                        subproblems.append("wrong field: biblatex uses journaltitle, journal")
+                        subproblems.append(
+                            "wrong field: biblatex uses journaltitle, journal")
                         counterWrongFieldNames += 1
-                
+
                     if "." in line:
-                        subproblems.append("flawed name: abbreviated journal title '"+value+"'")
+                        subproblems.append(
+                            "flawed name: abbreviated journal title '" + value + "'")
                         counterFlawedNames += 1
-                     
 
                 # check booktitle format; expected format "ICBAB '13: Proceeding of the 13th International Conference on Bla and Blubb"
-                #if currentType == "inproceedings" and field == "booktitle":
-                    #if ":" not in line or ("Proceedings" not in line and "Companion" not in line) or "." in line or " '" not in line or "workshop" in line or "conference" in line or "symposium" in line:
+                # if currentType == "inproceedings" and field == "booktitle":
+                    # if ":" not in line or ("Proceedings" not in line and "Companion" not in line) or "." in line or " '" not in line or "workshop" in line or "conference" in line or "symposium" in line:
                         #subproblems.append("flawed name: inconsistent formatting of booktitle '"+value+"'")
-                        #counterFlawedNames += 1   
+                        #counterFlawedNames += 1
 
                  # check if title is capitalized (heuristic)
-                 #if field == "title":
-                    #for word in currentTitle.split(" "):
+                 # if field == "title":
+                    # for word in currentTitle.split(" "):
                         #word = word.strip(":")
-                        #if len(word) > 7 and word[0].islower() and not  "-" in word and not "_"  in word and not "[" in word:
-                            #subproblems.append("flawed name: non-capitalized title '"+currentTitle+"'")
-                            #counterFlawedNames += 1
-                            #break
-                 
-                ####################################################################
-                 
+                        # if len(word) > 7 and word[0].islower() and not  "-" in word and not "_"  in word and not "[" in word:
+                        #subproblems.append("flawed name: non-capitalized title '"+currentTitle+"'")
+                        #counterFlawedNames += 1
+                        # break
+
+                ###############################################################
+
 fIn.close()
 
 # Write out our HTML file
@@ -508,15 +527,16 @@ $(document).ready(function(){
 </div>
 """)
 html.write("<div class='info'><h2>Info</h2><ul>")
-html.write("<li>bib file: "+bibFile+"</li>")
-html.write("<li>aux file: "+auxFile+"</li>")
-html.write("<li># entries: "+str(len(problems))+"</li>")
-html.write("<li># problems: "+str(counterMissingFields+counterFlawedNames+counterWrongTypes+counterNonUniqueId)+"</li><ul>")
-html.write("<li># missing fields: "+str(counterMissingFields)+"</li>")
-html.write("<li># flawed names: "+str(counterFlawedNames)+"</li>")
-html.write("<li># wrong types: "+str(counterWrongTypes)+"</li>")
-html.write("<li># non-unique id: "+str(counterNonUniqueId)+"</li>")
-html.write("<li># wrong field: "+str(counterWrongFieldNames)+"</li>")
+html.write("<li>bib file: " + bibFile + "</li>")
+html.write("<li>aux file: " + auxFile + "</li>")
+html.write("<li># entries: " + str(len(problems)) + "</li>")
+html.write("<li># problems: " + str(counterMissingFields +
+                                    counterFlawedNames + counterWrongTypes + counterNonUniqueId) + "</li><ul>")
+html.write("<li># missing fields: " + str(counterMissingFields) + "</li>")
+html.write("<li># flawed names: " + str(counterFlawedNames) + "</li>")
+html.write("<li># wrong types: " + str(counterWrongTypes) + "</li>")
+html.write("<li># non-unique id: " + str(counterNonUniqueId) + "</li>")
+html.write("<li># wrong field: " + str(counterWrongFieldNames) + "</li>")
 html.write("</ul></ul></div>")
 
 problems.sort()
