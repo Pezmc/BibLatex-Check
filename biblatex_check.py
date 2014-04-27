@@ -76,7 +76,7 @@ from optparse import OptionParser
 
 # Parse options
 usage = sys.argv[
-    0] + " [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>] [-h|--help]"
+    0] + " [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>] [-v|--view] [-h|--help]"
 
 parser = OptionParser(usage=usage)
 
@@ -88,12 +88,16 @@ parser.add_option("-a", "--aux", dest="auxFile",
 
 parser.add_option("-o", "--output", dest="htmlOutput",
                   help="HTML Output File", metavar="output.html", default="biblatex_check.html")
+				  
+parser.add_option("-v", "--view", dest="view", action="store_true",
+                  help="Open in Browser")
 
 (options, args) = parser.parse_args()
 
 auxFile = options.auxFile
 bibFile = options.bibFile
 htmlOutput = options.htmlOutput
+view = options.view
 
 # Enforce python 3 or above
 if sys.version_info[0] < 3:
@@ -544,3 +548,7 @@ for problem in problems:
     html.write(problem)
 html.write("</body></html>")
 html.close()
+
+if view:
+    import webbrowser
+    webbrowser.open(html.name)
