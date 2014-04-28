@@ -6,7 +6,7 @@ especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
@@ -78,10 +78,10 @@ from optparse import OptionParser
 usage = sys.argv[
     0] + " [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>] [-v|--view] [-h|--help]"
 
-parser = OptionParser(usage=usage)
+parser = OptionParser(usage)
 
 parser.add_option("-b", "--bib", dest="bibFile",
-                  help="Bib File", metavar="input.bib", default="references.bib")
+                  help="Bib File", metavar="input.bib", default="input.bib")
 
 parser.add_option("-a", "--aux", dest="auxFile",
                   help="Aux File", metavar="input.aux", default="references.aux")
@@ -549,6 +549,10 @@ for problem in problems:
 html.write("</body></html>")
 html.close()
 
+<<<<<<< HEAD
 if view:
     import webbrowser
     webbrowser.open(html.name)
+=======
+print("SUCCESS: Report {} has been generated".format(htmlOutput))
+>>>>>>> 53c205dc8be6f69cfb1b9769b097c1b30e093b2a
