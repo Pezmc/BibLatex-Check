@@ -554,4 +554,3 @@ if view:
     webbrowser.open(html.name)
 
 print("SUCCESS: Report {} has been generated".format(htmlOutput))
->>>>>>> 53c205dc8be6f69cfb1b9769b097c1b30e093b2a
