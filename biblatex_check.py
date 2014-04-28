@@ -549,10 +549,9 @@ for problem in problems:
 html.write("</body></html>")
 html.close()
 
-<<<<<<< HEAD
 if view:
     import webbrowser
     webbrowser.open(html.name)
-=======
+
 print("SUCCESS: Report {} has been generated".format(htmlOutput))
 >>>>>>> 53c205dc8be6f69cfb1b9769b097c1b30e093b2a
