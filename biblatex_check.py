@@ -269,7 +269,7 @@ for line in fIn:
 fIn.close()
 
 # Write out our HTML file
-html = open(htmlOutput, 'w')
+html = open(htmlOutput, 'w', encoding="utf8")
 html.write("""<html>
 <head>
 <title>BibLatex Check</title>
