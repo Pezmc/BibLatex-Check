@@ -88,7 +88,7 @@ parser.add_option("-a", "--aux", dest="auxFile",
 
 parser.add_option("-o", "--output", dest="htmlOutput",
                   help="HTML Output File", metavar="output.html", default="biblatex_check.html")
-				  
+
 parser.add_option("-v", "--view", dest="view", action="store_true",
                   help="Open in Browser")
 
@@ -284,7 +284,7 @@ body {
 
 #title {
     width: 720px;
-    
+
     border-bottom: 1px solid black;
 }
 

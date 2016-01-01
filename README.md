@@ -1,6 +1,6 @@
 BibLatex-Check
 ==============
-*A python3 script for checking BibLatex .bib files*
+*A python2/3 script for checking BibLatex .bib files*
 
 BibTeX Check is a small Python script that goes through a list of references and checks if certain required fields are available, for instance, if each publication is assigned a year or if a journal article has a volume and issue number.
 
@@ -15,7 +15,7 @@ Please note that it is **not a BibLaTeX validator**. And in the current version,
 Just copy the file into a directory with write permission, then run the script
 
 	./biblatex_check.py <input.bib> [input.aux] [output.html]
-	
+
 If you provide the additional aux file (created when compiling a tex document), then the check of the bib file is restricted to only those entries that are really cited in the tex document.
 
 The html output is tested with Firefox and Chrome, but the current version does not properly work with Internet Explorer.
@@ -35,4 +35,3 @@ See [BibTex vs BibLaTex vs NatBib](http://tex.stackexchange.com/questions/25701/
 
 ##License
 MIT license
-
