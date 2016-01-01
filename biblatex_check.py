@@ -24,7 +24,7 @@ libraries = [("Scholar", "http://scholar.google.de/scholar?hl=en&q="),
              ("Google", "https://www.google.com/search?q="),
              ("DBLP", "http://dblp.org/search/index.php#query="),
              ("IEEE", "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="),
-             ("ACM", "http://dl.acm.org/results.cfm?nquery="),
+             ("ACM", "http://dl.acm.org/results.cfm?query="),
              ]
 
 
