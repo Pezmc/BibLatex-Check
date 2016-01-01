@@ -127,7 +127,7 @@ except IOError as e:
           "' doesn't exist or is not readable")
     sys.exit()
 
-# Go through and check all referneces
+# Go through and check all references
 completeEntry = ""
 currentId = ""
 ids = []
@@ -151,23 +151,32 @@ for line in fIn:
     if line.startswith("@"):
         if currentId in usedIds or not usedIds:
             for fieldName, requiredFieldsType in requiredFields.items():
-
-                if fieldName == currentType:
+                if fieldName == currentType.lower():
                     if isinstance(requiredFieldsType, str):
                         currentrequiredFields = requiredFields[fieldName]
-                    else:
-                        currentrequiredFields = requiredFieldsType
-
-                    for requiredFieldsString in currentrequiredFields:
 
                         # support for author/editor syntax
                         typeFields = requiredFieldsString.split('/')
 
-                        # at least one these required fields is not found
+                        # the required field is not found
                         if set(typeFields).isdisjoint(fields):
                             subproblems.append(
                                 "missing field '" + requiredFieldsString + "'")
                             counterMissingFields += 1
+                    else:
+                        currentrequiredFields = requiredFieldsType
+
+                        # currentrequiredFields can be a string: e.g. conference (BellAdam2004)
+                        for requiredFieldsString in currentrequiredFields:
+
+                            # support for author/editor syntax
+                            typeFields = requiredFieldsString.split('/')
+
+                            # at least one these required fields is not found
+                            if set(typeFields).isdisjoint(fields):
+                                subproblems.append(
+                                    "missing field '" + requiredFieldsString + "'")
+                                counterMissingFields += 1
         else:
             subproblems = []
 
