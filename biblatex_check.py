@@ -24,7 +24,7 @@ libraries = [("Scholar", "http://scholar.google.de/scholar?hl=en&q="),
              ("Google", "https://www.google.com/search?q="),
              ("DBLP", "http://dblp.org/search/index.php#query="),
              ("IEEE", "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="),
-             ("ACM", "http://dl.acm.org/results.cfm?nquery="),
+             ("ACM", "http://dl.acm.org/results.cfm?query="),
              ]
 
 
@@ -88,7 +88,7 @@ parser.add_option("-a", "--aux", dest="auxFile",
 
 parser.add_option("-o", "--output", dest="htmlOutput",
                   help="HTML Output File", metavar="output.html", default="biblatex_check.html")
-				  
+
 parser.add_option("-v", "--view", dest="view", action="store_true",
                   help="Open in Browser")
 
@@ -99,11 +99,28 @@ bibFile = options.bibFile
 htmlOutput = options.htmlOutput
 view = options.view
 
-# Enforce python 3 or above
-if sys.version_info[0] < 3:
-    print(
-        "This script requires Python version 3, try python3 ./" + sys.argv[0])
-    sys.exit(1)
+# Backporting Python 3 open(encoding="utf-8") to Python 2
+# based on http://stackoverflow.com/questions/10971033/backporting-python-3-openencoding-utf-8-to-python-2
+
+if sys.version_info[0] > 2:
+    # py3k
+    pass
+else:
+    # py2
+    import codecs
+    import warnings
+    reload(sys)
+    sys.setdefaultencoding('utf8')
+    def open(file, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None, closefd=True, opener=None):
+        if newline is not None:
+            warnings.warn('newline is not supported in py2')
+        if not closefd:
+            warnings.warn('closefd is not supported in py2')
+        if opener is not None:
+            warnings.warn('opener is not supported in py2')
+        return codecs.open(filename=file, mode=mode, encoding=encoding,
+                    errors=errors, buffering=buffering)
 
 # Find used refernece ID's only
 usedIds = set()
@@ -293,7 +310,7 @@ body {
 
 #title {
     width: 720px;
-    
+
     border-bottom: 1px solid black;
 }
 
