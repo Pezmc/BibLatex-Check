@@ -14,11 +14,19 @@ Please note that it is **not a BibLaTeX validator**. And in the current version,
 
 Just copy the file into a directory with write permission, then run the script
 
-	./biblatex_check.py <input.bib> [input.aux] [output.html]
+	./biblatex_check.py <-b input.bib> [-a input.aux] [-o output.html]
 	
 If you provide the additional aux file (created when compiling a tex document), then the check of the bib file is restricted to only those entries that are really cited in the tex document.
 
 The html output is tested with Firefox and Chrome, but the current version does not properly work with Internet Explorer.
+
+## Options
+Specify these when calling the script.
+
+- -b (--bib) Set the input Bib File
+- -a (--aux) Set the input Aux File
+- -o (--output) Set the HTML Output File
+- -v (--view) Open in Browser")
 
 ##Help
 See `./biblatex_check.py -h` for basic help.
