@@ -6,7 +6,7 @@ especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow"
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
@@ -46,7 +46,7 @@ requiredFields = {"article": ["author", "title", "journaltitle", "year/date"],
                   "patent": ["author", "title", "number", "year/date"],
                   "periodical": ["editor", "title", "year/date"],
                   "suppperiodical": "article",
-                  "proceedings": ["editor", "title", "year/date"],
+                  "proceedings": ["title", "year/date"],
                   "mvproceedings": "proceedings",
                   "inproceedings": ["author", "title", "booktitle", "year/date"],
                   "reference": "collection",
