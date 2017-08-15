@@ -1,5 +1,6 @@
 BibLatex-Check
 ==============
+
 *A python2/3 script for checking BibLatex .bib files*
 
 BibTeX Check is a small Python script that goes through a list of references and checks if certain required fields are available, for instance, if each publication is assigned a year or if a journal article has a volume and issue number.
@@ -10,7 +11,7 @@ The results of the check are printed to an html file, which includes links to Go
 
 Please note that it is **not a BibLaTeX validator**. And in the current version, it might not yet be able to parse every valid bib file. The software targets the specific needs of Computer Scientist, but may be applicable in other fields as well.
 
-##Getting Started
+## Getting Started
 
 Just copy the file into a directory with write permission, then run the script
 
@@ -21,6 +22,7 @@ If you provide the additional aux file (created when compiling a tex document), 
 The html output is tested with Firefox and Chrome, but the current version does not properly work with Internet Explorer.
 
 ## Options
+
 Specify these when calling the script.
 
 - -b (--bib) Set the input Bib File
@@ -28,18 +30,22 @@ Specify these when calling the script.
 - -o (--output) Set the HTML Output File
 - -v (--view) Open in Browser")
 
-##Help
+## Help
+
 See `./biblatex_check.py -h` for basic help.
 
 If your getting an environment error, try using `python ./biblatex_check.py` or `python3 ./biblatex_check.py` depending on your OS.
 
 ##Alternatives
+
 BibLatex check is adapted from [BibTex Check](https://code.google.com/p/bibtex-check/) by Fabian Beck, which can be used to validate BibTex files.
 
 See [BibTex vs BibLaTex vs NatBib](http://tex.stackexchange.com/questions/25701/bibtex-vs-biber-and-biblatex-vs-natbib) for a comparison of different referencing packages.
 
-##Screenshot
+## Screenshot
+
 ![Screenshots of the BibLatex check screen](/../screenshots/screenshots/checkscreen.png?raw=true "BibLatex Check")
 
-##License
+## License
+
 MIT license
