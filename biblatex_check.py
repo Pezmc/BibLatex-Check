@@ -64,7 +64,8 @@ requiredFields = {"article": ["author", "title", "journaltitle", "year/date"],
                   "conference": "inproceedings",
                   "electronic": "online",
                   "phdthesis": "mastersthesis",
-                  "www": "online"
+                  "www": "online",
+                  "school": "mastersthesis"
                   }
 
 ####################################################################
