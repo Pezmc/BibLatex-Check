@@ -143,7 +143,7 @@ try:
 except IOError as e:
     print("ERROR: Input bib file '" + bibFile +
           "' doesn't exist or is not readable")
-    sys.exit()
+    sys.exit(-1)
 
 # Go through and check all references
 completeEntry = ""
@@ -581,3 +581,7 @@ if view:
     webbrowser.open(html.name)
 
 print("SUCCESS: Report {} has been generated".format(htmlOutput))
+
+if problemCount > 0:
+    print("WARNING: Found {} problems.".format(problemCount))
+    sys.exit(-1)
