@@ -297,21 +297,22 @@ fIn.close()
 
 # Write out our HTML file
 html = open(htmlOutput, 'w', encoding="utf8")
-html.write("""<html>
+html.write("""<!doctype html>
+<html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <title>BibLatex Check</title>
 <style>
 body {
     font-family: Calibri, Arial, Sans;
     padding: 10px;
     width: 1030px;
-    margin: 10 auto;
+    margin: 10px auto;
     border-top: 1px solid black;
 }
 
 #title {
     width: 720px;
-
     border-bottom: 1px solid black;
 }
 
@@ -553,6 +554,7 @@ $(document).ready(function(){
           <label for = "mode_all">all</label>
 <input type="button" value="uncheck all" id="uncheck_button"></button>
 </form>
+<br style="clear: both; " />
 </div>
 </div>
 """)
