@@ -90,6 +90,9 @@ parser.add_option("-a", "--aux", dest="auxFile",
 parser.add_option("-o", "--output", dest="htmlOutput",
                   help="HTML Output File", metavar="output.html", default="biblatex_check.html")
 
+parser.add_option("-c", "--config", dest="config",
+                  help="HTML Output File", metavar="config.json5")
+
 parser.add_option("-v", "--view", dest="view", action="store_true",
                   help="Open in Browser")
 
@@ -99,6 +102,7 @@ auxFile = options.auxFile
 bibFile = options.bibFile
 htmlOutput = options.htmlOutput
 view = options.view
+configFile = options.config
 
 # Backporting Python 3 open(encoding="utf-8") to Python 2
 # based on http://stackoverflow.com/questions/10971033/backporting-python-3-openencoding-utf-8-to-python-2
@@ -144,6 +148,17 @@ except IOError as e:
     print("ERROR: Input bib file '" + bibFile +
           "' doesn't exist or is not readable")
     sys.exit(-1)
+
+# Load config file
+if configFile:
+    try:
+        import json5 as json
+    except ImportError:
+        print ("WARNING: json5 not installed, trying to use json")
+        import json
+    with open(configFile) as config:
+        data = json.load(config)
+    requiredFields = data["requiredFields"]
 
 # Go through and check all references
 completeEntry = ""
@@ -297,21 +312,22 @@ fIn.close()
 
 # Write out our HTML file
 html = open(htmlOutput, 'w', encoding="utf8")
-html.write("""<html>
+html.write("""<!doctype html>
+<html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <title>BibLatex Check</title>
 <style>
 body {
     font-family: Calibri, Arial, Sans;
     padding: 10px;
     width: 1030px;
-    margin: 10 auto;
+    margin: 10px auto;
     border-top: 1px solid black;
 }
 
 #title {
     width: 720px;
-
     border-bottom: 1px solid black;
 }
 
@@ -553,6 +569,7 @@ $(document).ready(function(){
           <label for = "mode_all">all</label>
 <input type="button" value="uncheck all" id="uncheck_button"></button>
 </form>
+<br style="clear: both; " />
 </div>
 </div>
 """)

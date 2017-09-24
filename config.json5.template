@@ -1,0 +1,41 @@
+{
+requiredFields: {
+    "article": ["author", "title", "journaltitle", "year/date"],
+    "book": ["author", "title", "year/date"],
+    "mvbook": "book",
+    "inbook": ["author", "title", "booktitle", "year/date"],
+    "bookinbook": "inbook",
+    "suppbook": "inbook",
+    "booklet": ["author/editor", "title", "year/date"],
+    "collection": ["editor", "title", "year/date"],
+    "mvcollection": "collection",
+    "incollection": ["author", "title", "booktitle", "year/date"],
+    "suppcollection": "incollection",
+    "manual": ["author/editor", "title", "year/date"],
+    "misc": ["author/editor", "title", "year/date"],
+    "online": ["author/editor", "title", "year/date", "url"],
+    "patent": ["author", "title", "number", "year/date"],
+    "periodical": ["editor", "title", "year/date"],
+    "suppperiodical": "article",
+    "proceedings": ["title", "year/date"],
+    "mvproceedings": "proceedings",
+    "inproceedings": ["author", "title", "booktitle", "year/date"],
+    "reference": "collection",
+    "mvreference": "collection",
+    "inreference": "incollection",
+    "report": ["author", "title", "type", "institution", "year/date"],
+    "thesis": ["author", "title", "type", "institution", "year/date"],
+    "unpublished": ["author", "title", "year/date"],
+
+    //  semi aliases (differing fields)
+    "mastersthesis": ["author", "title", "institution", "year/date"],
+    "techreport": ["author", "title", "institution", "year/date"],
+
+    //  other aliases
+    "conference": "inproceedings",
+    "electronic": "online",
+    "phdthesis": "mastersthesis",
+    "www": "online",
+    "school": "mastersthesis",
+}
+}
