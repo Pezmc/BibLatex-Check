@@ -28,6 +28,7 @@ Specify these when calling the script.
 - -b (--bib) Set the input Bib File
 - -a (--aux) Set the input Aux File
 - -o (--output) Set the HTML Output File
+- -c (--config=file.json5) Load config file
 - -v (--view) Open in Browser")
 
 ## Help
