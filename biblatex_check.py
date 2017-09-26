@@ -88,10 +88,13 @@ parser.add_option("-a", "--aux", dest="auxFile",
                   help="Aux File", metavar="input.aux", default="references.aux")
 
 parser.add_option("-o", "--output", dest="htmlOutput",
-                  help="HTML Output File", metavar="output.html", default="biblatex_check.html")
+                  help="HTML Output File", metavar="output.html")
 
 parser.add_option("-v", "--view", dest="view", action="store_true",
                   help="Open in Browser")
+
+parser.add_option("-N", "--no-console", dest="no_console", action="store_true",
+                  help="Do not print problems to console")
 
 (options, args) = parser.parse_args()
 
@@ -99,6 +102,7 @@ auxFile = options.auxFile
 bibFile = options.bibFile
 htmlOutput = options.htmlOutput
 view = options.view
+toconsole = not options.no_console
 
 # Backporting Python 3 open(encoding="utf-8") to Python 2
 # based on http://stackoverflow.com/questions/10971033/backporting-python-3-openencoding-utf-8-to-python-2
@@ -220,6 +224,8 @@ for line in fIn:
             problem += "<ul>"
             for subproblem in subproblems:
                 problem += "<li>" + subproblem + "</li>"
+                if toconsole:
+                    print("PROBLEM: " + currentId + " - " + subproblem)
             problem += "</ul>"
             problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
             problem += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
@@ -295,23 +301,28 @@ for line in fIn:
 
 fIn.close()
 
+
+problemCount = counterMissingFields + counterFlawedNames + counterWrongFieldNames + counterWrongTypes + counterNonUniqueId
+
 # Write out our HTML file
-html = open(htmlOutput, 'w', encoding="utf8")
-html.write("""<html>
+if htmlOutput:
+    html = open(htmlOutput, 'w', encoding="utf8")
+    html.write("""<!doctype html>
+<html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <title>BibLatex Check</title>
 <style>
 body {
     font-family: Calibri, Arial, Sans;
     padding: 10px;
     width: 1030px;
-    margin: 10 auto;
+    margin: 10px auto;
     border-top: 1px solid black;
 }
 
 #title {
     width: 720px;
-
     border-bottom: 1px solid black;
 }
 
@@ -553,34 +564,33 @@ $(document).ready(function(){
           <label for = "mode_all">all</label>
 <input type="button" value="uncheck all" id="uncheck_button"></button>
 </form>
+<br style="clear: both; " />
 </div>
 </div>
 """)
-problemCount = counterMissingFields + counterFlawedNames + counterWrongFieldNames + \
-               counterWrongTypes + counterNonUniqueId
-html.write("<div class='info'><h2>Info</h2><ul>")
-html.write("<li>bib file: " + bibFile + "</li>")
-html.write("<li>aux file: " + auxFile + "</li>")
-html.write("<li># entries: " + str(len(problems)) + "</li>")
-html.write("<li># problems: " + str(problemCount) + "</li><ul>")
-html.write("<li># missing fields: " + str(counterMissingFields) + "</li>")
-html.write("<li># flawed names: " + str(counterFlawedNames) + "</li>")
-html.write("<li># wrong types: " + str(counterWrongTypes) + "</li>")
-html.write("<li># non-unique id: " + str(counterNonUniqueId) + "</li>")
-html.write("<li># wrong field: " + str(counterWrongFieldNames) + "</li>")
-html.write("</ul></ul></div>")
+    html.write("<div class='info'><h2>Info</h2><ul>")
+    html.write("<li>bib file: " + bibFile + "</li>")
+    html.write("<li>aux file: " + auxFile + "</li>")
+    html.write("<li># entries: " + str(len(problems)) + "</li>")
+    html.write("<li># problems: " + str(problemCount) + "</li><ul>")
+    html.write("<li># missing fields: " + str(counterMissingFields) + "</li>")
+    html.write("<li># flawed names: " + str(counterFlawedNames) + "</li>")
+    html.write("<li># wrong types: " + str(counterWrongTypes) + "</li>")
+    html.write("<li># non-unique id: " + str(counterNonUniqueId) + "</li>")
+    html.write("<li># wrong field: " + str(counterWrongFieldNames) + "</li>")
+    html.write("</ul></ul></div>")
 
-problems.sort()
-for problem in problems:
-    html.write(problem)
-html.write("</body></html>")
-html.close()
+    problems.sort()
+    for problem in problems:
+        html.write(problem)
+    html.write("</body></html>")
+    html.close()
 
-if view:
-    import webbrowser
-    webbrowser.open(html.name)
+    if view:
+        import webbrowser
+        webbrowser.open(html.name)
 
-print("SUCCESS: Report {} has been generated".format(htmlOutput))
+    print("SUCCESS: Report {} has been generated".format(htmlOutput))
 
 if problemCount > 0:
     print("WARNING: Found {} problems.".format(problemCount))
