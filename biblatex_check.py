@@ -175,15 +175,15 @@ for line in fIn:
             for fieldName, requiredFieldsType in requiredFields.items():
                 if fieldName == currentType.lower():
                     if isinstance(requiredFieldsType, str):
-                        currentrequiredFields = requiredFields[fieldName]
+                        currentrequiredField = requiredFields[fieldName]
 
                         # support for author/editor syntax
-                        typeFields = requiredFieldsString.split('/')
+                        typeFields = currentrequiredField.split('/')
 
                         # the required field is not found
                         if set(typeFields).isdisjoint(fields):
                             subproblems.append(
-                                "missing field '" + requiredFieldsString + "'")
+                                "missing field '" + currentrequiredField + "'")
                             counterMissingFields += 1
                     else:
                         currentrequiredFields = requiredFieldsType
