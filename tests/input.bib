@@ -1,0 +1,44 @@
+% This file should fail with the commented errors
+% 7 errors expected
+
+% "misc": ["author/editor", "title", "year/date"]
+% year/date missing
+@misc{lehman2006biblatex,
+  title={The biblatex package},
+  author={Lehman, Philipp and others}
+}
+
+% "book": ["author", "title", "year/date"]
+% author missing
+@book{lamport1986latex,
+  title={LaTEX: User's Guide \& Reference Manual},
+  year={1986}
+}
+
+% "unpublished": ["author", "title", "year/date"],
+% author and year missing
+@unpublished{loeliger2012version,
+  title={Not yet published book}
+}
+
+% "techreport": ["author", "title", "institution", "year/date"]
+% institution and title missing
+@techreport{torvalds2010git,
+  author={Torvalds, Linus and Hamano, Junio},
+  year={2010}
+}
+
+% "electronic": "online", "online": ["author/editor", "title", "year/date", "url"]
+% url missing
+@electronic{lamport1994latex,
+  editor={Creodocs Limited},
+  title={LaTeX Templates: The best source of free quality LaTeX templates},
+  year={2017}
+}
+
+% "conference": "inproceedings", "inproceedings": ["author", "title", "booktitle", "year/date"],
+% book title and year/date missing
+@conference{emberFest2017,
+  author={Joe Bloggs},
+  title={All About Ember}
+}

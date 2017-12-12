@@ -98,12 +98,6 @@ parser.add_option("-N", "--no-console", dest="no_console", action="store_true",
 
 (options, args) = parser.parse_args()
 
-auxFile = options.auxFile
-bibFile = options.bibFile
-htmlOutput = options.htmlOutput
-view = options.view
-toconsole = not options.no_console
-
 # Backporting Python 3 open(encoding="utf-8") to Python 2
 # based on http://stackoverflow.com/questions/10971033/backporting-python-3-openencoding-utf-8-to-python-2
 
@@ -127,27 +121,39 @@ else:
         return codecs.open(filename=file, mode=mode, encoding=encoding,
                     errors=errors, buffering=buffering)
 
-# Find used refernece ID's only
-usedIds = set()
-try:
-    fInAux = open(auxFile, 'r', encoding="utf8")
-    for line in fInAux:
-        if line.startswith("\\citation"):
-            ids = line.split("{")[1].rstrip("} \n").split(", ")
-            for id in ids:
-                if (id != ""):
-                    usedIds.add(id)
-    fInAux.close()
-except IOError as e:
-    print ("WARNING: Aux file '" + auxFile +
-           "' doesn't exist -> not restricting entries")
+### End Backport ###
 
+print("INFO: Reading references from '" + options.bibFile + "'")
 try:
-    fIn = open(bibFile, 'r', encoding="utf8")
+    fIn = open(options.bibFile, 'r', encoding="utf8")
 except IOError as e:
-    print("ERROR: Input bib file '" + bibFile +
+    print("ERROR: Input bib file '" + options.bibFile +
           "' doesn't exist or is not readable")
     sys.exit(-1)
+
+if options.no_console:
+    print("INFO: Will surpress problems on console")
+
+if options.htmlOutput:
+    print("INFO: Will output HTML to '" + options.htmlOutput + "'"
+        + (" and auto open in the default web browser" if options.view else ""))
+
+# Filter by reference ID's that are used
+usedIds = set()
+if options.auxFile:
+    print("INFO: Filtering by references found in '" + options.auxFile + "'")
+    try:
+        fInAux = open(options.auxFile, 'r', encoding="utf8")
+        for line in fInAux:
+            if line.startswith("\\citation"):
+                ids = line.split("{")[1].rstrip("} \n").split(", ")
+                for id in ids:
+                    if (id != ""):
+                        usedIds.add(id)
+        fInAux.close()
+    except IOError as e:
+        print ("WARNING: Aux file '" + options.auxFile +
+               "' doesn't exist -> not restricting entries")
 
 # Go through and check all references
 completeEntry = ""
@@ -174,31 +180,20 @@ for line in fIn:
         if currentId in usedIds or not usedIds:
             for fieldName, requiredFieldsType in requiredFields.items():
                 if fieldName == currentType.lower():
-                    if isinstance(requiredFieldsType, str):
-                        currentrequiredFields = requiredFields[fieldName]
+                    # alises use a string to point at another set of fields
+                    currentRequiredFields = requiredFieldsType
+                    while isinstance(currentRequiredFields, str):
+                        currentRequiredFields = requiredFields[currentRequiredFields] # resolve alias
 
+                    for requiredFieldsString in currentRequiredFields:
                         # support for author/editor syntax
                         typeFields = requiredFieldsString.split('/')
 
-                        # the required field is not found
+                        # at least one the required fields is not found
                         if set(typeFields).isdisjoint(fields):
                             subproblems.append(
                                 "missing field '" + requiredFieldsString + "'")
                             counterMissingFields += 1
-                    else:
-                        currentrequiredFields = requiredFieldsType
-
-                        # currentrequiredFields can be a string: e.g. conference (BellAdam2004)
-                        for requiredFieldsString in currentrequiredFields:
-
-                            # support for author/editor syntax
-                            typeFields = requiredFieldsString.split('/')
-
-                            # at least one these required fields is not found
-                            if set(typeFields).isdisjoint(fields):
-                                subproblems.append(
-                                    "missing field '" + requiredFieldsString + "'")
-                                counterMissingFields += 1
         else:
             subproblems = []
 
@@ -224,7 +219,7 @@ for line in fIn:
             problem += "<ul>"
             for subproblem in subproblems:
                 problem += "<li>" + subproblem + "</li>"
-                if toconsole:
+                if not options.no_console:
                     print("PROBLEM: " + currentId + " - " + subproblem)
             problem += "</ul>"
             problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
@@ -305,8 +300,8 @@ fIn.close()
 problemCount = counterMissingFields + counterFlawedNames + counterWrongFieldNames + counterWrongTypes + counterNonUniqueId
 
 # Write out our HTML file
-if htmlOutput:
-    html = open(htmlOutput, 'w', encoding="utf8")
+if options.htmlOutput:
+    html = open(options.htmlOutput, 'w', encoding="utf8")
     html.write("""<!doctype html>
 <html>
 <head>
@@ -569,8 +564,8 @@ $(document).ready(function(){
 </div>
 """)
     html.write("<div class='info'><h2>Info</h2><ul>")
-    html.write("<li>bib file: " + bibFile + "</li>")
-    html.write("<li>aux file: " + auxFile + "</li>")
+    html.write("<li>bib file: " + options.bibFile + "</li>")
+    html.write("<li>aux file: " + options.auxFile + "</li>")
     html.write("<li># entries: " + str(len(problems)) + "</li>")
     html.write("<li># problems: " + str(problemCount) + "</li><ul>")
     html.write("<li># missing fields: " + str(counterMissingFields) + "</li>")
@@ -586,11 +581,11 @@ $(document).ready(function(){
     html.write("</body></html>")
     html.close()
 
-    if view:
+    if options.view:
         import webbrowser
         webbrowser.open(html.name)
 
-    print("SUCCESS: Report {} has been generated".format(htmlOutput))
+    print("SUCCESS: Report {} has been generated".format(options.htmlOutput))
 
 if problemCount > 0:
     print("WARNING: Found {} problems.".format(problemCount))
