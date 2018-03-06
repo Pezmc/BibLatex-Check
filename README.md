@@ -40,7 +40,7 @@ See `./biblatex_check.py -h` for basic help.
 
 If your getting an environment error, try using `python ./biblatex_check.py` or `python3 ./biblatex_check.py` depending on your OS.
 
-##Alternatives
+## Alternatives
 
 BibLatex check is adapted from [BibTex Check](https://code.google.com/p/bibtex-check/) by Fabian Beck, which can be used to validate BibTex files.
 
