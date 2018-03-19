@@ -29,7 +29,7 @@ libraries = [("Scholar", "http://scholar.google.de/scholar?hl=en&q="),
 
 
 # fields that are required for a specific type of entry
-requiredFields = {"article": ["author", "title", "journaltitle", "year/date"],
+requiredFields = {"article": ["author", "title", "journaltitle/journal", "year/date"],
                   "book": ["author", "title", "year/date"],
                   "mvbook": "book",
                   "inbook": ["author", "title", "booktitle", "year/date"],
@@ -266,11 +266,6 @@ for line in fIn:
 
                 # check if abbreviations are used in journal titles
                 if currentType == "article" and (field == "journal" or field == "journaltitle"):
-
-                    if field == "journal":
-                        subproblems.append(
-                            "wrong field: biblatex uses journaltitle, not journal")
-                        counterWrongFieldNames += 1
 
                     if "." in line:
                         subproblems.append(
