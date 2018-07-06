@@ -1,6 +1,8 @@
 BibLatex-Check
 ==============
 
+**A web based version of this checker is now available: https://biblatex-linter.herokuapp.com/** [(repo)](https://github.com/Pezmc/BibLatex-Linter)
+
 *A python2/3 script for checking BibLatex .bib files*
 
 BibTeX Check is a small Python script that goes through a list of references and checks if certain required fields are available, for instance, if each publication is assigned a year or if a journal article has a volume and issue number.
