@@ -174,7 +174,7 @@ counterWrongFieldNames = 0
 
 removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
-for line in fIn:
+for (lineNumber, line) in enumerate(fIn):
     line = line.strip("\n")
     if line.startswith("@"):
         if currentId in usedIds or not usedIds:
@@ -220,7 +220,7 @@ for line in fIn:
             for subproblem in subproblems:
                 problem += "<li>" + subproblem + "</li>"
                 if not options.no_console:
-                    print("PROBLEM: " + currentId + " - " + subproblem)
+                    print >> sys.stderr, "PROBLEM: {}:{} - {} - {}".format(options.bibFile, lineNumber, currentId, subproblem)
             problem += "</ul>"
             problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
             problem += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
