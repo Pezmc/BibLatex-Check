@@ -176,7 +176,25 @@ removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
 for (lineNumber, line) in enumerate(fIn):
     line = line.strip("\n")
+
+    # Staring a new entry
     if line.startswith("@"):
+        fields = []
+        subproblems = []
+
+        currentId = line.split("{")[1].rstrip(",\n")
+        if currentId in ids:
+            subproblems.append("non-unique id: '" + currentId + "'")
+            counterNonUniqueId += 1
+        else:
+            ids.append(currentId)
+        currentType = line.split("{")[0].strip("@ ")
+        completeEntry = line + "<br />"
+
+    # Closing out the current entry
+    elif line.startswith("}"):
+        completeEntry += line + "<br />"
+
         if currentId in usedIds or not usedIds:
             for fieldName, requiredFieldsType in requiredFields.items():
                 if fieldName == currentType.lower():
@@ -227,16 +245,6 @@ for (lineNumber, line) in enumerate(fIn):
             problem += "<div class='bibtex'>" + completeEntry + "</div>"
             problem += "</div>"
             problems.append(problem)
-        fields = []
-        subproblems = []
-        currentId = line.split("{")[1].rstrip(",\n")
-        if currentId in ids:
-            subproblems.append("non-unique id: '" + currentId + "'")
-            counterNonUniqueId += 1
-        else:
-            ids.append(currentId)
-        currentType = line.split("{")[0].strip("@ ")
-        completeEntry = line + "<br />"
     else:
         if line != "":
             completeEntry += line + "<br />"
