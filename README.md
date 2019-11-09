@@ -1,3 +1,12 @@
+## This project no longer under active development
+### It remains fully functional and maintenance is still completed
+
+Assistance with enhancements, feature requests and bug fixes are all very welcome!
+
+Any PR's will be reviewed promptly.
+
+---
+
 BibLatex-Check
 ==============
 
