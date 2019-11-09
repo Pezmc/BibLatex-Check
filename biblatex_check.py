@@ -475,8 +475,12 @@ function isInProblemMode() {
 }
 
 function update() {
-    $('.problem').hide();
-    $('.problem[id*='+$('#search input').val()+']').show();
+    if ($('#search input').val() !== "") {
+        $('.problem').hide();
+        $('.problem[id*='+$('#search input').val()+' i]').show();
+    } else {
+        $('.problem').show();
+    }
     $('.problem .checked').each(function () {
         if ($(this).attr('checked')) {
             $(this).parents('.problem').addClass('problem_checked');
