@@ -199,9 +199,10 @@ for (lineNumber, line) in enumerate(fIn):
 
     # Closing out the current entry
     elif line.startswith("}"):
-        # deactivating comma check also needs commenting these two lines above
-        subproblems = subproblems[:-1]
-        counterMissingCommas -= 1
+        # deactivating comma check also needs commenting these three lines above
+        if lastLine == lineNumber - 1:
+            subproblems = subproblems[:-1]
+            counterMissingCommas -= 1
 
         completeEntry += line + "<br />"
 
@@ -309,6 +310,7 @@ for (lineNumber, line) in enumerate(fIn):
                 if line[-1] != ",":
                     subproblems.append("missing comma at end of line, at '" + field + "' field definition." )
                     counterMissingCommas += 1
+                    lastLine = lineNumber
                 ###############################################################
 
 fIn.close()
@@ -593,6 +595,7 @@ $(document).ready(function(){
     html.write("<li># wrong types: " + str(counterWrongTypes) + "</li>")
     html.write("<li># non-unique id: " + str(counterNonUniqueId) + "</li>")
     html.write("<li># wrong field: " + str(counterWrongFieldNames) + "</li>")
+    html.write("<li># missing comma: " + str(counterMissingCommas) + "</li>")
     html.write("</ul></ul></div>")
 
     problems.sort()
