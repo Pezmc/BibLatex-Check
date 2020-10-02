@@ -171,6 +171,7 @@ counterFlawedNames = 0
 counterWrongTypes = 0
 counterNonUniqueId = 0
 counterWrongFieldNames = 0
+counterMissingCommas = 0
 
 removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
@@ -183,6 +184,11 @@ for (lineNumber, line) in enumerate(fIn):
         subproblems = []
 
         currentId = line.split("{")[1].rstrip(",\n")
+
+        if line[-1] != ',':
+            subproblems.append("missing comma at '@" + currentId + "' definition")
+            counterMissingCommas += 1
+
         if currentId in ids:
             subproblems.append("non-unique id: '" + currentId + "'")
             counterNonUniqueId += 1
@@ -193,6 +199,10 @@ for (lineNumber, line) in enumerate(fIn):
 
     # Closing out the current entry
     elif line.startswith("}"):
+        # deactivating comma check also needs commenting these two lines above
+        subproblems = subproblems[:-1]
+        counterMissingCommas -= 1
+
         completeEntry += line + "<br />"
 
         if currentId in usedIds or not usedIds:
@@ -295,12 +305,15 @@ for (lineNumber, line) in enumerate(fIn):
                         #counterFlawedNames += 1
                         # break
 
+                # check for commas at end of line
+                if line[-1] != ",":
+                    subproblems.append("missing comma at end of line, at '" + field + "' field definition." )
+                    counterMissingCommas += 1
                 ###############################################################
 
 fIn.close()
 
-
-problemCount = counterMissingFields + counterFlawedNames + counterWrongFieldNames + counterWrongTypes + counterNonUniqueId
+problemCount = counterMissingFields + counterFlawedNames + counterWrongFieldNames + counterWrongTypes + counterNonUniqueId + counterMissingCommas
 
 # Write out our HTML file
 if options.htmlOutput:
