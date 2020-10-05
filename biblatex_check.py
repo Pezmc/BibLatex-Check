@@ -6,7 +6,7 @@ especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow"
-__version__ = "0.1.4"
+__version__ = "0.2.0"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
