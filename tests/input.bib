@@ -1,5 +1,5 @@
 % This file should fail with the commented errors
-% 9 errors expected
+% 14 errors expected
 
 % "misc": ["author/editor", "title", "year/date"]
 % year/date missing
@@ -37,8 +37,25 @@
 }
 
 % "conference": "inproceedings", "inproceedings": ["author", "title", "booktitle", "year/date"],
-% book title and year/date missing
+% book title and year/date missing.
 @conference{emberFest2017,
   author={Joe Bloggs},
   title={All About Ember}
+}
+
+% "article": ["author", "title", "journal", "year"]
+% missing commas on author and journal lines
+@book{elephants,
+  author={Rodney A. Brooks}
+  title={Elephants Don't Play Chess},
+  journal={Robotics and Autonomous Systems}
+  year={1990}
+}
+
+% "techreport": ["author", "title", "institution", "year/date"]
+@techreport{paneMyers
+  author={John Pane and Brad Myers},
+  title={Usability Issues in the Design of Novice Programming Systems}
+  institution={Carnegie Mellon University}
+  year={1996},
 }

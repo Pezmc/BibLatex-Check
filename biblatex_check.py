@@ -171,6 +171,7 @@ counterFlawedNames = 0
 counterWrongTypes = 0
 counterNonUniqueId = 0
 counterWrongFieldNames = 0
+counterMissingCommas = 0
 
 removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
@@ -183,6 +184,11 @@ for (lineNumber, line) in enumerate(fIn):
         subproblems = []
 
         currentId = line.split("{")[1].rstrip(",\n")
+
+        if line[-1] != ',':
+            subproblems.append("missing comma at '@" + currentId + "' definition")
+            counterMissingCommas += 1
+
         if currentId in ids:
             subproblems.append("non-unique id: '" + currentId + "'")
             counterNonUniqueId += 1
@@ -193,6 +199,11 @@ for (lineNumber, line) in enumerate(fIn):
 
     # Closing out the current entry
     elif line.startswith("}"):
+        # deactivating comma check also needs commenting these three lines above
+        if lastLine == lineNumber - 1:
+            subproblems = subproblems[:-1]
+            counterMissingCommas -= 1
+
         completeEntry += line + "<br />"
 
         if currentId in usedIds or not usedIds:
@@ -296,12 +307,16 @@ for (lineNumber, line) in enumerate(fIn):
                         #counterFlawedNames += 1
                         # break
 
+                # check for commas at end of line
+                if line[-1] != ",":
+                    subproblems.append("missing comma at end of line, at '" + field + "' field definition." )
+                    counterMissingCommas += 1
+                    lastLine = lineNumber
                 ###############################################################
 
 fIn.close()
 
-
-problemCount = counterMissingFields + counterFlawedNames + counterWrongFieldNames + counterWrongTypes + counterNonUniqueId
+problemCount = counterMissingFields + counterFlawedNames + counterWrongFieldNames + counterWrongTypes + counterNonUniqueId + counterMissingCommas
 
 # Write out our HTML file
 if options.htmlOutput:
@@ -581,6 +596,7 @@ $(document).ready(function(){
     html.write("<li># wrong types: " + str(counterWrongTypes) + "</li>")
     html.write("<li># non-unique id: " + str(counterNonUniqueId) + "</li>")
     html.write("<li># wrong field: " + str(counterWrongFieldNames) + "</li>")
+    html.write("<li># missing comma: " + str(counterMissingCommas) + "</li>")
     html.write("</ul></ul></div>")
 
     problems.sort()
