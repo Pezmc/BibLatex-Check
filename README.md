@@ -61,6 +61,24 @@ See [BibTex vs BibLaTex vs NatBib](http://tex.stackexchange.com/questions/25701/
 
 ![Screenshots of the BibLatex check screen](/../screenshots/screenshots/checkscreen.png?raw=true "BibLatex Check")
 
+## Development
+
+The checker is a single python script that takes .bib files as input and prints to console and/or an html file.
+
+It maintains compatibility with Python 2, so any changes should be run against both Python 2.7 and 3.
+
+Any bug fixes should be paired with a new test case in `tests/input.bib`
+
+### "Running" the tests
+
+```bash
+python3 ./biblatex_check.py -b tests/input.bib
+python2 ./biblatex_check.py -b tests/input.bib
+```
+
+Then _manually_ confirm the number of errors matches the details top of `tests/input.bib`
+
+
 ## License
 
 MIT license
