@@ -238,7 +238,8 @@ for (lineNumber, line) in enumerate(fIn):
             for subproblem in subproblems:
                 problem += "<li>" + subproblem + "</li>"
                 if not options.no_console:
-                    print("PROBLEM: {}:{} - {} - {}".format(options.bibFile, lineNumber, currentId, subproblem), file=sys.stderr)
+                    errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(options.bibFile, lineNumber, currentId, subproblem)
+                    sys.stderr.write(errorMessage)
             problem += "</ul>"
             problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
             problem += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
