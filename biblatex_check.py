@@ -265,10 +265,22 @@ for (lineNumber, line) in enumerate(fIn):
                 # biblatex is not case sensitive
                 field = line.split("=")[0].strip().lower()
                 fields.append(field)
-                value = line.split("=")[1].strip("{} ,\n")
+                value = line.split("=")[1].strip(", \n").strip("{} \n")
                 if field == "author":
                     currentAuthor = filter(
                         lambda x: not (x in "\\\"{}"), value.split(" and ")[0])
+                    for author in value.split(" and "):
+                        comp = author.split(",")
+                        if len(comp) == 0:
+                            subproblems.append("too little name components for an author in field 'author'")
+                        elif len(comp) > 2:
+                            subproblems.append("too many name components for an author in field 'author'")
+                        elif len(comp) == 2:
+                            if comp[0].strip() == "":
+                                subproblems.append("last name of an author in field 'author' empty")
+                            if comp[1].strip() == "":
+                                subproblems.append("first name of an author in field 'author' empty")
+
                 if field == "citeulike-article-id":
                     currentArticleId = value
                 if field == "title":
