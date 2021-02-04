@@ -59,3 +59,29 @@
   institution={Carnegie Mellon University}
   year={1996},
 }
+
+% "article": ["author", "title", "journal", "year"]
+% wrong author
+@techreport{nistFIPS197Advanced2001,
+  title = {{{FIPS}} 197, {{Advanced Encryption Standard}} ({{AES}})},
+  author = {, NIST},
+  institution = {National Institute of Standards and Technology},
+  date = {2001-11-26},
+  pages = {51},
+  langid = {english}
+}
+
+% "report": ["author", "title", "date"]
+% 3 author components (should be 'lastname, firstname')
+@report{petersonObservationsModelingSeismic1993,
+  title = {Observations and Modeling of Seismic Background Noise},
+  author = {Peterson, Jon, R},
+  date = {1993},
+  institution = {{U.S. Geological Survey}},
+  doi = {10.3133/ofr93322},
+  url = {http://pubs.er.usgs.gov/publication/ofr93322},
+  urldate = {2020-12-30},
+  number = {93-322},
+  series = {Open-{{File Report}}},
+  type = {USGS Numbered Series}
+}
