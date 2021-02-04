@@ -6,7 +6,7 @@ especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
@@ -16,7 +16,7 @@ __email__ = "email<at>pezcuckow.com"
 ####################################################################
 
 # links
-citeulikeUsername = ""  # if no username is profided, no CiteULike links appear
+citeulikeUsername = ""  # if no username is provided, no CiteULike links appear
 citeulikeHref = "http://www.citeulike.org/user/" + citeulikeUsername + "/article/"
 
 libraries = [
