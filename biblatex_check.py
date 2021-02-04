@@ -17,56 +17,55 @@ __email__ = "email<at>pezcuckow.com"
 
 # links
 citeulikeUsername = ""  # if no username is profided, no CiteULike links appear
-citeulikeHref = "http://www.citeulike.org/user/" + \
-    citeulikeUsername + "/article/"
+citeulikeHref = "http://www.citeulike.org/user/" + citeulikeUsername + "/article/"
 
-libraries = [("Scholar", "http://scholar.google.de/scholar?hl=en&q="),
-             ("Google", "https://www.google.com/search?q="),
-             ("DBLP", "http://dblp.org/search/index.php#query="),
-             ("IEEE", "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="),
-             ("ACM", "http://dl.acm.org/results.cfm?query="),
-             ]
+libraries = [
+    ("Scholar", "http://scholar.google.de/scholar?hl=en&q="),
+    ("Google", "https://www.google.com/search?q="),
+    ("DBLP", "http://dblp.org/search/index.php#query="),
+    ("IEEE", "http://ieeexplore.ieee.org/search/searchresult.jsp?queryText="),
+    ("ACM", "http://dl.acm.org/results.cfm?query="),
+]
 
 
 # fields that are required for a specific type of entry
-requiredFields = {"article": ["author", "title", "journaltitle/journal", "year/date"],
-                  "book": ["author", "title", "year/date"],
-                  "mvbook": "book",
-                  "inbook": ["author", "title", "booktitle", "year/date"],
-                  "bookinbook": "inbook",
-                  "suppbook": "inbook",
-                  "booklet": ["author/editor", "title", "year/date"],
-                  "collection": ["editor", "title", "year/date"],
-                  "mvcollection": "collection",
-                  "incollection": ["author", "title", "booktitle", "year/date"],
-                  "suppcollection": "incollection",
-                  "manual": ["author/editor", "title", "year/date"],
-                  "misc": ["author/editor", "title", "year/date"],
-                  "online": ["author/editor", "title", "year/date", "url"],
-                  "patent": ["author", "title", "number", "year/date"],
-                  "periodical": ["editor", "title", "year/date"],
-                  "suppperiodical": "article",
-                  "proceedings": ["title", "year/date"],
-                  "mvproceedings": "proceedings",
-                  "inproceedings": ["author", "title", "booktitle", "year/date"],
-                  "reference": "collection",
-                  "mvreference": "collection",
-                  "inreference": "incollection",
-                  "report": ["author", "title", "type", "institution", "year/date"],
-                  "thesis": ["author", "title", "type", "institution", "year/date"],
-                  "unpublished": ["author", "title", "year/date"],
-
-                  # semi aliases (differing fields)
-                  "mastersthesis": ["author", "title", "institution", "year/date"],
-                  "techreport": ["author", "title", "institution", "year/date"],
-
-                  # other aliases
-                  "conference": "inproceedings",
-                  "electronic": "online",
-                  "phdthesis": "mastersthesis",
-                  "www": "online",
-                  "school": "mastersthesis"
-                  }
+requiredFields = {
+    "article": ["author", "title", "journaltitle/journal", "year/date"],
+    "book": ["author", "title", "year/date"],
+    "mvbook": "book",
+    "inbook": ["author", "title", "booktitle", "year/date"],
+    "bookinbook": "inbook",
+    "suppbook": "inbook",
+    "booklet": ["author/editor", "title", "year/date"],
+    "collection": ["editor", "title", "year/date"],
+    "mvcollection": "collection",
+    "incollection": ["author", "title", "booktitle", "year/date"],
+    "suppcollection": "incollection",
+    "manual": ["author/editor", "title", "year/date"],
+    "misc": ["author/editor", "title", "year/date"],
+    "online": ["author/editor", "title", "year/date", "url"],
+    "patent": ["author", "title", "number", "year/date"],
+    "periodical": ["editor", "title", "year/date"],
+    "suppperiodical": "article",
+    "proceedings": ["title", "year/date"],
+    "mvproceedings": "proceedings",
+    "inproceedings": ["author", "title", "booktitle", "year/date"],
+    "reference": "collection",
+    "mvreference": "collection",
+    "inreference": "incollection",
+    "report": ["author", "title", "type", "institution", "year/date"],
+    "thesis": ["author", "title", "type", "institution", "year/date"],
+    "unpublished": ["author", "title", "year/date"],
+    # semi aliases (differing fields)
+    "mastersthesis": ["author", "title", "institution", "year/date"],
+    "techreport": ["author", "title", "institution", "year/date"],
+    # other aliases
+    "conference": "inproceedings",
+    "electronic": "online",
+    "phdthesis": "mastersthesis",
+    "www": "online",
+    "school": "mastersthesis",
+}
 
 ####################################################################
 
@@ -76,25 +75,46 @@ import sys
 from optparse import OptionParser
 
 # Parse options
-usage = sys.argv[
-    0] + " [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>] [-v|--view] [-h|--help]"
+usage = (
+    sys.argv[0]
+    + " [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>] [-v|--view] [-h|--help]"
+)
 
 parser = OptionParser(usage)
 
-parser.add_option("-b", "--bib", dest="bibFile",
-                  help="Bib File", metavar="input.bib", default="input.bib")
+parser.add_option(
+    "-b",
+    "--bib",
+    dest="bibFile",
+    help="Bib File",
+    metavar="input.bib",
+    default="input.bib",
+)
 
-parser.add_option("-a", "--aux", dest="auxFile",
-                  help="Aux File", metavar="input.aux", default="references.aux")
+parser.add_option(
+    "-a",
+    "--aux",
+    dest="auxFile",
+    help="Aux File",
+    metavar="input.aux",
+    default="references.aux",
+)
 
-parser.add_option("-o", "--output", dest="htmlOutput",
-                  help="HTML Output File", metavar="output.html")
+parser.add_option(
+    "-o", "--output", dest="htmlOutput", help="HTML Output File", metavar="output.html"
+)
 
-parser.add_option("-v", "--view", dest="view", action="store_true",
-                  help="Open in Browser")
+parser.add_option(
+    "-v", "--view", dest="view", action="store_true", help="Open in Browser"
+)
 
-parser.add_option("-N", "--no-console", dest="no_console", action="store_true",
-                  help="Do not print problems to console")
+parser.add_option(
+    "-N",
+    "--no-console",
+    dest="no_console",
+    action="store_true",
+    help="Do not print problems to console",
+)
 
 (options, args) = parser.parse_args()
 
@@ -108,52 +128,78 @@ else:
     # py2
     import codecs
     import warnings
+
     reload(sys)
-    sys.setdefaultencoding('utf8')
-    def open(file, mode='r', buffering=-1, encoding=None,
-             errors=None, newline=None, closefd=True, opener=None):
+    sys.setdefaultencoding("utf8")
+
+    def open(
+        file,
+        mode="r",
+        buffering=-1,
+        encoding=None,
+        errors=None,
+        newline=None,
+        closefd=True,
+        opener=None,
+    ):
         if newline is not None:
-            warnings.warn('newline is not supported in py2')
+            warnings.warn("newline is not supported in py2")
         if not closefd:
-            warnings.warn('closefd is not supported in py2')
+            warnings.warn("closefd is not supported in py2")
         if opener is not None:
-            warnings.warn('opener is not supported in py2')
-        return codecs.open(filename=file, mode=mode, encoding=encoding,
-                    errors=errors, buffering=buffering)
+            warnings.warn("opener is not supported in py2")
+        return codecs.open(
+            filename=file,
+            mode=mode,
+            encoding=encoding,
+            errors=errors,
+            buffering=buffering,
+        )
+
 
 ### End Backport ###
 
 print("INFO: Reading references from '" + options.bibFile + "'")
 try:
-    fIn = open(options.bibFile, 'r', encoding="utf8")
+    fIn = open(options.bibFile, "r", encoding="utf8")
 except IOError as e:
-    print("ERROR: Input bib file '" + options.bibFile +
-          "' doesn't exist or is not readable")
+    print(
+        "ERROR: Input bib file '"
+        + options.bibFile
+        + "' doesn't exist or is not readable"
+    )
     sys.exit(-1)
 
 if options.no_console:
     print("INFO: Will surpress problems on console")
 
 if options.htmlOutput:
-    print("INFO: Will output HTML to '" + options.htmlOutput + "'"
-        + (" and auto open in the default web browser" if options.view else ""))
+    print(
+        "INFO: Will output HTML to '"
+        + options.htmlOutput
+        + "'"
+        + (" and auto open in the default web browser" if options.view else "")
+    )
 
 # Filter by reference ID's that are used
 usedIds = set()
 if options.auxFile:
     print("INFO: Filtering by references found in '" + options.auxFile + "'")
     try:
-        fInAux = open(options.auxFile, 'r', encoding="utf8")
+        fInAux = open(options.auxFile, "r", encoding="utf8")
         for line in fInAux:
             if line.startswith("\\citation"):
                 ids = line.split("{")[1].rstrip("} \n").split(", ")
                 for id in ids:
-                    if (id != ""):
+                    if id != "":
                         usedIds.add(id)
         fInAux.close()
     except IOError as e:
-        print ("WARNING: Aux file '" + options.auxFile +
-               "' doesn't exist -> not restricting entries")
+        print(
+            "WARNING: Aux file '"
+            + options.auxFile
+            + "' doesn't exist -> not restricting entries"
+        )
 
 # Go through and check all references
 completeEntry = ""
@@ -185,7 +231,7 @@ for (lineNumber, line) in enumerate(fIn):
 
         currentId = line.split("{")[1].rstrip(",\n")
 
-        if line[-1] != ',':
+        if line[-1] != ",":
             subproblems.append("missing comma at '@" + currentId + "' definition")
             counterMissingCommas += 1
 
@@ -212,34 +258,52 @@ for (lineNumber, line) in enumerate(fIn):
                     # alises use a string to point at another set of fields
                     currentRequiredFields = requiredFieldsType
                     while isinstance(currentRequiredFields, str):
-                        currentRequiredFields = requiredFields[currentRequiredFields] # resolve alias
+                        currentRequiredFields = requiredFields[
+                            currentRequiredFields
+                        ]  # resolve alias
 
                     for requiredFieldsString in currentRequiredFields:
                         # support for author/editor syntax
-                        typeFields = requiredFieldsString.split('/')
+                        typeFields = requiredFieldsString.split("/")
 
                         # at least one the required fields is not found
                         if set(typeFields).isdisjoint(fields):
                             subproblems.append(
-                                "missing field '" + requiredFieldsString + "'")
+                                "missing field '" + requiredFieldsString + "'"
+                            )
                             counterMissingFields += 1
         else:
             subproblems = []
 
         if currentId in usedIds or (currentId and not usedIds):
             cleanedTitle = currentTitle.translate(removePunctuationMap)
-            problem = "<div id='" + currentId + \
-                "' class='problem severe" + str(len(subproblems)) + "'>"
+            problem = (
+                "<div id='"
+                + currentId
+                + "' class='problem severe"
+                + str(len(subproblems))
+                + "'>"
+            )
             problem += "<h2>" + currentId + " (" + currentType + ")</h2> "
             problem += "<div class='links'>"
             if citeulikeUsername:
-                problem += "<a href='" + citeulikeHref + \
-                    currentArticleId + "' target='_blank'>CiteULike</a> |"
+                problem += (
+                    "<a href='"
+                    + citeulikeHref
+                    + currentArticleId
+                    + "' target='_blank'>CiteULike</a> |"
+                )
 
             list = []
             for name, site in libraries:
                 list.append(
-                    " <a href='" + site + cleanedTitle + "' target='_blank'>" + name + "</a>")
+                    " <a href='"
+                    + site
+                    + cleanedTitle
+                    + "' target='_blank'>"
+                    + name
+                    + "</a>"
+                )
             problem += " | ".join(list)
 
             problem += "</div>"
@@ -249,7 +313,9 @@ for (lineNumber, line) in enumerate(fIn):
             for subproblem in subproblems:
                 problem += "<li>" + subproblem + "</li>"
                 if not options.no_console:
-                    errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(options.bibFile, lineNumber, currentId, subproblem)
+                    errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(
+                        options.bibFile, lineNumber, currentId, subproblem
+                    )
                     sys.stderr.write(errorMessage)
             problem += "</ul>"
             problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
@@ -268,23 +334,32 @@ for (lineNumber, line) in enumerate(fIn):
                 value = line.split("=")[1].strip(", \n").strip("{} \n")
                 if field == "author":
                     currentAuthor = filter(
-                        lambda x: not (x in "\\\"{}"), value.split(" and ")[0])
+                        lambda x: not (x in '\\"{}'), value.split(" and ")[0]
+                    )
                     for author in value.split(" and "):
                         comp = author.split(",")
                         if len(comp) == 0:
-                            subproblems.append("too little name components for an author in field 'author'")
+                            subproblems.append(
+                                "too little name components for an author in field 'author'"
+                            )
                         elif len(comp) > 2:
-                            subproblems.append("too many name components for an author in field 'author'")
+                            subproblems.append(
+                                "too many name components for an author in field 'author'"
+                            )
                         elif len(comp) == 2:
                             if comp[0].strip() == "":
-                                subproblems.append("last name of an author in field 'author' empty")
+                                subproblems.append(
+                                    "last name of an author in field 'author' empty"
+                                )
                             if comp[1].strip() == "":
-                                subproblems.append("first name of an author in field 'author' empty")
+                                subproblems.append(
+                                    "first name of an author in field 'author' empty"
+                                )
 
                 if field == "citeulike-article-id":
                     currentArticleId = value
                 if field == "title":
-                    currentTitle = re.sub(r'\}|\{', r'', value)
+                    currentTitle = re.sub(r"\}|\{", r"", value)
 
                 ###############################################################
                 # Checks (please (de)activate/extend to your needs)
@@ -293,47 +368,63 @@ for (lineNumber, line) in enumerate(fIn):
                 # check if type 'proceedings' might be 'inproceedings'
                 if currentType == "proceedings" and field == "pages":
                     subproblems.append(
-                        "wrong type: maybe should be 'inproceedings' because entry has page numbers")
+                        "wrong type: maybe should be 'inproceedings' because entry has page numbers"
+                    )
                     counterWrongTypes += 1
 
                 # check if abbreviations are used in journal titles
-                if currentType == "article" and (field == "journal" or field == "journaltitle"):
+                if currentType == "article" and (
+                    field == "journal" or field == "journaltitle"
+                ):
 
                     if "." in line:
                         subproblems.append(
-                            "flawed name: abbreviated journal title '" + value + "'")
+                            "flawed name: abbreviated journal title '" + value + "'"
+                        )
                         counterFlawedNames += 1
 
                 # check booktitle format; expected format "ICBAB '13: Proceeding of the 13th International Conference on Bla and Blubb"
                 # if currentType == "inproceedings" and field == "booktitle":
-                    # if ":" not in line or ("Proceedings" not in line and "Companion" not in line) or "." in line or " '" not in line or "workshop" in line or "conference" in line or "symposium" in line:
-                        #subproblems.append("flawed name: inconsistent formatting of booktitle '"+value+"'")
-                        #counterFlawedNames += 1
+                # if ":" not in line or ("Proceedings" not in line and "Companion" not in line) or "." in line or " '" not in line or "workshop" in line or "conference" in line or "symposium" in line:
+                # subproblems.append("flawed name: inconsistent formatting of booktitle '"+value+"'")
+                # counterFlawedNames += 1
 
-                 # check if title is capitalized (heuristic)
-                 # if field == "title":
-                    # for word in currentTitle.split(" "):
-                        #word = word.strip(":")
-                        # if len(word) > 7 and word[0].islower() and not  "-" in word and not "_"  in word and not "[" in word:
-                        #subproblems.append("flawed name: non-capitalized title '"+currentTitle+"'")
-                        #counterFlawedNames += 1
-                        # break
+                # check if title is capitalized (heuristic)
+                # if field == "title":
+                # for word in currentTitle.split(" "):
+                # word = word.strip(":")
+                # if len(word) > 7 and word[0].islower() and not  "-" in word and not "_"  in word and not "[" in word:
+                # subproblems.append("flawed name: non-capitalized title '"+currentTitle+"'")
+                # counterFlawedNames += 1
+                # break
 
                 # check for commas at end of line
                 if line[-1] != ",":
-                    subproblems.append("missing comma at end of line, at '" + field + "' field definition." )
+                    subproblems.append(
+                        "missing comma at end of line, at '"
+                        + field
+                        + "' field definition."
+                    )
                     counterMissingCommas += 1
                     lastLine = lineNumber
                 ###############################################################
 
 fIn.close()
 
-problemCount = counterMissingFields + counterFlawedNames + counterWrongFieldNames + counterWrongTypes + counterNonUniqueId + counterMissingCommas
+problemCount = (
+    counterMissingFields
+    + counterFlawedNames
+    + counterWrongFieldNames
+    + counterWrongTypes
+    + counterNonUniqueId
+    + counterMissingCommas
+)
 
 # Write out our HTML file
 if options.htmlOutput:
-    html = open(options.htmlOutput, 'w', encoding="utf8")
-    html.write("""<!doctype html>
+    html = open(options.htmlOutput, "w", encoding="utf8")
+    html.write(
+        """<!doctype html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -597,7 +688,8 @@ $(document).ready(function(){
 <br style="clear: both; " />
 </div>
 </div>
-""")
+"""
+    )
     html.write("<div class='info'><h2>Info</h2><ul>")
     html.write("<li>bib file: " + options.bibFile + "</li>")
     html.write("<li>aux file: " + options.auxFile + "</li>")
@@ -619,6 +711,7 @@ $(document).ready(function(){
 
     if options.view:
         import webbrowser
+
         webbrowser.open(html.name)
 
     print("SUCCESS: Report {} has been generated".format(options.htmlOutput))
