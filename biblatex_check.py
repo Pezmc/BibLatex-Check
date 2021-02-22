@@ -204,7 +204,7 @@ if options.auxFile:
         )
 
 # Go through and check all references
-completeEntry = ""
+entryHTML = ""
 entryId = ""
 ids = []
 entryType = ""
@@ -223,8 +223,21 @@ counterMissingCommas = 0
 
 removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
+#######
+
+
+def resolveAliasedRequiredFields(entryRequiredFields):
+    global requiredEntryFields
+
+    # Aliases use a string to point at another set of fields
+    while isinstance(entryRequiredFields, str):
+        entryRequiredFields = requiredEntryFields.get(entryRequiredFields)
+
+    return entryRequiredFields
+
+
 def handleNewEntryStarting(line):
-    global fields, subproblems, entryId, entryType, completeEntry, counterMissingCommas
+    global fields, subproblems, entryId, entryType, entryHTML, counterMissingCommas
 
     fields = []
     subproblems = []
@@ -242,7 +255,96 @@ def handleNewEntryStarting(line):
         ids.append(entryId)
 
     entryType = line.split("{")[0].strip("@ ")
-    completeEntry = line + "<br />"
+    entryHTML = line + "<br />"
+
+
+def handleEntryEnding(line):
+    global fields, subproblems, entryHTML, counterMissingFields, counterMissingCommas
+
+    # Last line of entry is allowed to have missing comma
+    if lastLine == lineNumber - 1:
+        subproblems = subproblems[:-1]
+        counterMissingCommas -= 1
+
+    # Support for type aliases
+    fields = map(
+        lambda typeName: fieldAliases.get(typeName)
+        if typeName in fieldAliases
+        else typeName,
+        fields,
+    )
+
+    entryHTML += line + "<br />"
+
+    if entryId in usedIds or not usedIds:
+        entryRequiredFields = requiredEntryFields.get(entryType.lower())
+        entryRequiredFields = resolveAliasedRequiredFields(entryRequiredFields)
+
+        for requiredEntryField in entryRequiredFields:
+            # support for author/editor syntax
+            requiredEntryField = requiredEntryField.split("/")
+
+            # at least one the required fields is not found
+            if set(requiredEntryField).isdisjoint(fields):
+                subproblems.append(
+                    "missing field '" + "/".join(requiredEntryField) + "'"
+                )
+                counterMissingFields += 1
+
+    else:
+        subproblems = []
+
+    if entryId in usedIds or (entryId and not usedIds):
+        cleanedTitle = currentTitle.translate(removePunctuationMap)
+        problem = (
+            "<div id='"
+            + entryId
+            + "' class='problem severe"
+            + str(len(subproblems))
+            + "'>"
+        )
+        problem += "<h2>" + entryId + " (" + entryType + ")</h2> "
+        problem += "<div class='links'>"
+        if citeulikeUsername:
+            problem += (
+                "<a href='"
+                + citeulikeHref
+                + currentArticleId
+                + "' target='_blank'>CiteULike</a> |"
+            )
+
+        list = []
+        for name, site in libraries:
+            list.append(
+                " <a href='"
+                + site
+                + cleanedTitle
+                + "' target='_blank'>"
+                + name
+                + "</a>"
+            )
+        problem += " | ".join(list)
+
+        problem += "</div>"
+        problem += "<div class='reference'>" + currentTitle
+        problem += "</div>"
+        problem += "<ul>"
+        for subproblem in subproblems:
+            problem += "<li>" + subproblem + "</li>"
+            if not options.no_console:
+                errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(
+                    options.bibFile, lineNumber, entryId, subproblem
+                )
+                sys.stderr.write(errorMessage)
+        problem += "</ul>"
+        problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
+        problem += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
+        problem += "<div class='bibtex'>" + entryHTML + "</div>"
+        problem += "</div>"
+        problems.append(problem)
+
+
+#######
 
 # Loop over then input file
 for (lineNumber, line) in enumerate(fIn):
@@ -254,95 +356,11 @@ for (lineNumber, line) in enumerate(fIn):
 
     # Closing out the current entry
     elif line.startswith("}"):
-        # deactivating comma check also needs commenting these three lines above
-        if lastLine == lineNumber - 1:
-            subproblems = subproblems[:-1]
-            counterMissingCommas -= 1
+        handleEntryEnding(line)
 
-        # support for type aliases
-        fields = map(
-            lambda typeName: fieldAliases.get(typeName)
-            if typeName in fieldAliases
-            else typeName,
-            fields,
-        )
-
-        completeEntry += line + "<br />"
-
-        if entryId in usedIds or not usedIds:
-            for fieldName, requiredEntryFieldsType in requiredEntryFields.items():
-                if fieldName == entryType.lower():
-                    # alises use a string to point at another set of fields
-                    currentRequiredFields = requiredEntryFieldsType
-                    while isinstance(currentRequiredFields, str):
-                        currentRequiredFields = requiredEntryFields[
-                            currentRequiredFields
-                        ]  # resolve alias
-
-                    for requiredEntryFieldsString in currentRequiredFields:
-                        # support for author/editor syntax
-                        typeFields = requiredEntryFieldsString.split("/")
-
-                        # at least one the required fields is not found
-                        if set(typeFields).isdisjoint(fields):
-                            subproblems.append(
-                                "missing field '" + requiredEntryFieldsString + "'"
-                            )
-                            counterMissingFields += 1
-        else:
-            subproblems = []
-
-        if entryId in usedIds or (entryId and not usedIds):
-            cleanedTitle = currentTitle.translate(removePunctuationMap)
-            problem = (
-                "<div id='"
-                + entryId
-                + "' class='problem severe"
-                + str(len(subproblems))
-                + "'>"
-            )
-            problem += "<h2>" + entryId + " (" + entryType + ")</h2> "
-            problem += "<div class='links'>"
-            if citeulikeUsername:
-                problem += (
-                    "<a href='"
-                    + citeulikeHref
-                    + currentArticleId
-                    + "' target='_blank'>CiteULike</a> |"
-                )
-
-            list = []
-            for name, site in libraries:
-                list.append(
-                    " <a href='"
-                    + site
-                    + cleanedTitle
-                    + "' target='_blank'>"
-                    + name
-                    + "</a>"
-                )
-            problem += " | ".join(list)
-
-            problem += "</div>"
-            problem += "<div class='reference'>" + currentTitle
-            problem += "</div>"
-            problem += "<ul>"
-            for subproblem in subproblems:
-                problem += "<li>" + subproblem + "</li>"
-                if not options.no_console:
-                    errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(
-                        options.bibFile, lineNumber, entryId, subproblem
-                    )
-                    sys.stderr.write(errorMessage)
-            problem += "</ul>"
-            problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
-            problem += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
-            problem += "<div class='bibtex'>" + completeEntry + "</div>"
-            problem += "</div>"
-            problems.append(problem)
     else:
         if line != "":
-            completeEntry += line + "<br />"
+            entryHTML += line + "<br />"
         if entryId in usedIds or not usedIds:
             if "=" in line:
                 # biblatex is not case sensitive
