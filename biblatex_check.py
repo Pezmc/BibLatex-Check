@@ -218,23 +218,10 @@ def resolveAliasedRequiredFields(entryRequiredFields, requiredFieldsDict):
 
 
 def generateEntryProblemsHTML(
-    itemHTML,
-    itemId,
-    type,
-    articleId,
-    title,
-    problems,
-    author,
-    lineNumber
+    itemHTML, itemId, type, articleId, title, problems, author, lineNumber
 ):
     cleanedTitle = title.translate(removePunctuationMap)
-    html = (
-        "<div id='"
-        + itemId
-        + "' class='problem severe"
-        + str(len(problems))
-        + "'>"
-    )
+    html = "<div id='" + itemId + "' class='problem severe" + str(len(problems)) + "'>"
     html += "<h2>" + itemId + " (" + type + ")</h2> "
     html += "<div class='links'>"
     if citeulikeUsername:
@@ -373,7 +360,7 @@ def handleEntryEnding(lineNumber, line):
             entryTitle,
             entryProblems,
             entryAuthor,
-            lineNumber
+            lineNumber,
         )
         entriesProblemsHTML.append(entryProblemsHTML)
 
@@ -402,9 +389,7 @@ def handleEntryField(lineNumber, line):
 
     # Checks per field type
     if fieldName == "author":
-        entryAuthor = filter(
-            lambda x: not (x in '\\"{}'), fieldValue.split(" and ")[0]
-        )
+        entryAuthor = filter(lambda x: not (x in '\\"{}'), fieldValue.split(" and ")[0])
         for author in fieldValue.split(" and "):
             comp = author.split(",")
             if len(comp) == 0:
@@ -443,7 +428,7 @@ def handleEntryField(lineNumber, line):
         counterWrongTypes += 1
 
     # check if abbreviations are used in journal titles
-    elif entryType == "article" and fieldName in ('journal', 'journaltitle'):
+    elif entryType == "article" and fieldName in ("journal", "journaltitle"):
         if "." in line:
             entryProblems.append(
                 "flawed name: abbreviated journal title '" + fieldValue + "'"
