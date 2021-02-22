@@ -173,7 +173,7 @@ except IOError as e:
     sys.exit(-1)
 
 if options.no_console:
-    print("INFO: Will surpress problems on console")
+    print("INFO: Will suppress problems on console")
 
 if options.htmlOutput:
     print(
@@ -205,9 +205,9 @@ if options.auxFile:
 
 # Go through and check all references
 completeEntry = ""
-currentId = ""
+entryId = ""
 ids = []
-currentType = ""
+entryType = ""
 currentArticleId = ""
 currentTitle = ""
 fields = []
@@ -223,27 +223,34 @@ counterMissingCommas = 0
 
 removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
+def handleNewEntryStarting(line):
+    global fields, subproblems, entryId, entryType, completeEntry, counterMissingCommas
+
+    fields = []
+    subproblems = []
+
+    entryId = line.split("{")[1].rstrip(",\n")
+
+    if line[-1] != ",":
+        subproblems.append("missing comma at '@" + entryId + "' definition")
+        counterMissingCommas += 1
+
+    if entryId in ids:
+        subproblems.append("non-unique id: '" + entryId + "'")
+        counterNonUniqueId += 1
+    else:
+        ids.append(entryId)
+
+    entryType = line.split("{")[0].strip("@ ")
+    completeEntry = line + "<br />"
+
+# Loop over then input file
 for (lineNumber, line) in enumerate(fIn):
     line = line.strip("\n")
 
     # Staring a new entry
     if line.startswith("@"):
-        fields = []
-        subproblems = []
-
-        currentId = line.split("{")[1].rstrip(",\n")
-
-        if line[-1] != ",":
-            subproblems.append("missing comma at '@" + currentId + "' definition")
-            counterMissingCommas += 1
-
-        if currentId in ids:
-            subproblems.append("non-unique id: '" + currentId + "'")
-            counterNonUniqueId += 1
-        else:
-            ids.append(currentId)
-        currentType = line.split("{")[0].strip("@ ")
-        completeEntry = line + "<br />"
+        handleNewEntryStarting(line)
 
     # Closing out the current entry
     elif line.startswith("}"):
@@ -262,9 +269,9 @@ for (lineNumber, line) in enumerate(fIn):
 
         completeEntry += line + "<br />"
 
-        if currentId in usedIds or not usedIds:
+        if entryId in usedIds or not usedIds:
             for fieldName, requiredEntryFieldsType in requiredEntryFields.items():
-                if fieldName == currentType.lower():
+                if fieldName == entryType.lower():
                     # alises use a string to point at another set of fields
                     currentRequiredFields = requiredEntryFieldsType
                     while isinstance(currentRequiredFields, str):
@@ -285,16 +292,16 @@ for (lineNumber, line) in enumerate(fIn):
         else:
             subproblems = []
 
-        if currentId in usedIds or (currentId and not usedIds):
+        if entryId in usedIds or (entryId and not usedIds):
             cleanedTitle = currentTitle.translate(removePunctuationMap)
             problem = (
                 "<div id='"
-                + currentId
+                + entryId
                 + "' class='problem severe"
                 + str(len(subproblems))
                 + "'>"
             )
-            problem += "<h2>" + currentId + " (" + currentType + ")</h2> "
+            problem += "<h2>" + entryId + " (" + entryType + ")</h2> "
             problem += "<div class='links'>"
             if citeulikeUsername:
                 problem += (
@@ -324,7 +331,7 @@ for (lineNumber, line) in enumerate(fIn):
                 problem += "<li>" + subproblem + "</li>"
                 if not options.no_console:
                     errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(
-                        options.bibFile, lineNumber, currentId, subproblem
+                        options.bibFile, lineNumber, entryId, subproblem
                     )
                     sys.stderr.write(errorMessage)
             problem += "</ul>"
@@ -336,7 +343,7 @@ for (lineNumber, line) in enumerate(fIn):
     else:
         if line != "":
             completeEntry += line + "<br />"
-        if currentId in usedIds or not usedIds:
+        if entryId in usedIds or not usedIds:
             if "=" in line:
                 # biblatex is not case sensitive
                 field = line.split("=")[0].strip().lower()
@@ -376,14 +383,14 @@ for (lineNumber, line) in enumerate(fIn):
                 ###############################################################
 
                 # check if type 'proceedings' might be 'inproceedings'
-                if currentType == "proceedings" and field == "pages":
+                if entryType == "proceedings" and field == "pages":
                     subproblems.append(
                         "wrong type: maybe should be 'inproceedings' because entry has page numbers"
                     )
                     counterWrongTypes += 1
 
                 # check if abbreviations are used in journal titles
-                if currentType == "article" and (
+                if entryType == "article" and (
                     field == "journal" or field == "journaltitle"
                 ):
 
@@ -394,7 +401,7 @@ for (lineNumber, line) in enumerate(fIn):
                         counterFlawedNames += 1
 
                 # check booktitle format; expected format "ICBAB '13: Proceeding of the 13th International Conference on Bla and Blubb"
-                # if currentType == "inproceedings" and field == "booktitle":
+                # if entryType == "inproceedings" and field == "booktitle":
                 # if ":" not in line or ("Proceedings" not in line and "Companion" not in line) or "." in line or " '" not in line or "workshop" in line or "conference" in line or "symposium" in line:
                 # subproblems.append("flawed name: inconsistent formatting of booktitle '"+value+"'")
                 # counterFlawedNames += 1
