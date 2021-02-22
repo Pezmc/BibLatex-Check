@@ -67,6 +67,7 @@ requiredEntryFields = {
     "school": "mastersthesis",
 }
 
+# BibLaTeX has backwards compatibility with BibTeX for these fiends
 fieldAliases = {"school": "institution", "address": "location"}
 
 ####################################################################
@@ -204,13 +205,14 @@ if options.auxFile:
         )
 
 # Go through and check all references
+entriesIds = []
+
 entryHTML = ""
 entryId = ""
-ids = []
 entryType = ""
-currentArticleId = ""
-currentTitle = ""
-fields = []
+entryArticleId = ""
+entryTitle = ""
+entryFields = []
 problems = []
 subproblems = []
 
@@ -237,9 +239,9 @@ def resolveAliasedRequiredFields(entryRequiredFields):
 
 
 def handleNewEntryStarting(line):
-    global fields, subproblems, entryId, entryType, entryHTML, counterMissingCommas
+    global entryFields, subproblems, entryId, entryType, entryHTML, counterMissingCommas
 
-    fields = []
+    entryFields = []
     subproblems = []
 
     entryId = line.split("{")[1].rstrip(",\n")
@@ -248,30 +250,30 @@ def handleNewEntryStarting(line):
         subproblems.append("missing comma at '@" + entryId + "' definition")
         counterMissingCommas += 1
 
-    if entryId in ids:
+    if entryId in entriesIds:
         subproblems.append("non-unique id: '" + entryId + "'")
         counterNonUniqueId += 1
     else:
-        ids.append(entryId)
+        entriesIds.append(entryId)
 
     entryType = line.split("{")[0].strip("@ ")
     entryHTML = line + "<br />"
 
 
 def handleEntryEnding(line):
-    global fields, subproblems, entryHTML, counterMissingFields, counterMissingCommas
+    global entryFields, subproblems, entryHTML, counterMissingFields, counterMissingCommas
 
-    # Last line of entry is allowed to have missing comma
+    # Last line of entry is allowed to have missing comma 
     if lastLine == lineNumber - 1:
         subproblems = subproblems[:-1]
         counterMissingCommas -= 1
 
     # Support for type aliases
-    fields = map(
+    entryFields = map(
         lambda typeName: fieldAliases.get(typeName)
         if typeName in fieldAliases
         else typeName,
-        fields,
+        entryFields,
     )
 
     entryHTML += line + "<br />"
@@ -285,7 +287,7 @@ def handleEntryEnding(line):
             requiredEntryField = requiredEntryField.split("/")
 
             # at least one the required fields is not found
-            if set(requiredEntryField).isdisjoint(fields):
+            if set(requiredEntryField).isdisjoint(entryFields):
                 subproblems.append(
                     "missing field '" + "/".join(requiredEntryField) + "'"
                 )
@@ -295,7 +297,7 @@ def handleEntryEnding(line):
         subproblems = []
 
     if entryId in usedIds or (entryId and not usedIds):
-        cleanedTitle = currentTitle.translate(removePunctuationMap)
+        cleanedTitle = entryTitle.translate(removePunctuationMap)
         problem = (
             "<div id='"
             + entryId
@@ -309,7 +311,7 @@ def handleEntryEnding(line):
             problem += (
                 "<a href='"
                 + citeulikeHref
-                + currentArticleId
+                + entryArticleId
                 + "' target='_blank'>CiteULike</a> |"
             )
 
@@ -326,7 +328,7 @@ def handleEntryEnding(line):
         problem += " | ".join(list)
 
         problem += "</div>"
-        problem += "<div class='reference'>" + currentTitle
+        problem += "<div class='reference'>" + entryTitle
         problem += "</div>"
         problem += "<ul>"
         for subproblem in subproblems:
@@ -365,7 +367,7 @@ for (lineNumber, line) in enumerate(fIn):
             if "=" in line:
                 # biblatex is not case sensitive
                 field = line.split("=")[0].strip().lower()
-                fields.append(field)
+                entryFields.append(field)
                 value = line.split("=")[1].strip(", \n").strip("{} \n")
                 if field == "author":
                     currentAuthor = filter(
@@ -392,9 +394,9 @@ for (lineNumber, line) in enumerate(fIn):
                                 )
 
                 if field == "citeulike-article-id":
-                    currentArticleId = value
+                    entryArticleId = value
                 if field == "title":
-                    currentTitle = re.sub(r"\}|\{", r"", value)
+                    entryTitle = re.sub(r"\}|\{", r"", value)
 
                 ###############################################################
                 # Checks (please (de)activate/extend to your needs)
@@ -426,10 +428,10 @@ for (lineNumber, line) in enumerate(fIn):
 
                 # check if title is capitalized (heuristic)
                 # if field == "title":
-                # for word in currentTitle.split(" "):
+                # for word in entryTitle.split(" "):
                 # word = word.strip(":")
                 # if len(word) > 7 and word[0].islower() and not  "-" in word and not "_"  in word and not "[" in word:
-                # subproblems.append("flawed name: non-capitalized title '"+currentTitle+"'")
+                # subproblems.append("flawed name: non-capitalized title '"+entryTitle+"'")
                 # counterFlawedNames += 1
                 # break
 
