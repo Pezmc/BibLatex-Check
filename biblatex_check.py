@@ -29,7 +29,7 @@ libraries = [
 
 
 # fields that are required for a specific type of entry
-requiredFields = {
+requiredEntryFields = {
     "article": ["author", "title", "journaltitle/journal", "year/date"],
     "book": ["author", "title", "year/date"],
     "mvbook": "book",
@@ -263,23 +263,23 @@ for (lineNumber, line) in enumerate(fIn):
         completeEntry += line + "<br />"
 
         if currentId in usedIds or not usedIds:
-            for fieldName, requiredFieldsType in requiredFields.items():
+            for fieldName, requiredEntryFieldsType in requiredEntryFields.items():
                 if fieldName == currentType.lower():
                     # alises use a string to point at another set of fields
-                    currentRequiredFields = requiredFieldsType
+                    currentRequiredFields = requiredEntryFieldsType
                     while isinstance(currentRequiredFields, str):
-                        currentRequiredFields = requiredFields[
+                        currentRequiredFields = requiredEntryFields[
                             currentRequiredFields
                         ]  # resolve alias
 
-                    for requiredFieldsString in currentRequiredFields:
+                    for requiredEntryFieldsString in currentRequiredFields:
                         # support for author/editor syntax
-                        typeFields = requiredFieldsString.split("/")
+                        typeFields = requiredEntryFieldsString.split("/")
 
                         # at least one the required fields is not found
                         if set(typeFields).isdisjoint(fields):
                             subproblems.append(
-                                "missing field '" + requiredFieldsString + "'"
+                                "missing field '" + requiredEntryFieldsString + "'"
                             )
                             counterMissingFields += 1
         else:
