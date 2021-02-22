@@ -190,12 +190,12 @@ if options.auxFile:
     print("INFO: Filtering by references found in '" + options.auxFile + "'")
     try:
         fInAux = open(options.auxFile, "r", encoding="utf8")
-        for line in fInAux:
-            if line.startswith("\\citation"):
-                ids = line.split("{")[1].rstrip("} \n").split(", ")
-                for id in ids:
-                    if id != "":
-                        usedIds.add(id)
+        for auxLine in fInAux:
+            if auxLine.startswith("\\citation"):
+                entryIds = auxLine.split("{")[1].rstrip("} \n").split(", ")
+                for entryId in entryIds:
+                    if entryId != "":
+                        usedIds.add(entryId)
         fInAux.close()
     except IOError as e:
         print(
@@ -209,65 +209,66 @@ if options.auxFile:
 removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
 
-def resolveAliasedRequiredFields(entryRequiredFields, requiredEntryFields):
+def resolveAliasedRequiredFields(entryRequiredFields, requiredFieldsDict):
     # Aliases use a string to point at another set of fields
     while isinstance(entryRequiredFields, str):
-        entryRequiredFields = requiredEntryFields.get(entryRequiredFields)
+        entryRequiredFields = requiredFieldsDict.get(entryRequiredFields)
 
     return entryRequiredFields
 
 
 def generateEntryProblemsHTML(
-    entryHTML,
-    entryId,
-    entryType,
-    entryArticleId,
-    entryTitle,
-    entryFields,
-    entryProblems,
+    itemHTML,
+    itemId,
+    type,
+    articleId,
+    title,
+    problems,
+    author,
+    lineNumber
 ):
-    cleanedTitle = entryTitle.translate(removePunctuationMap)
+    cleanedTitle = title.translate(removePunctuationMap)
     html = (
         "<div id='"
-        + entryId
+        + itemId
         + "' class='problem severe"
-        + str(len(entryProblems))
+        + str(len(problems))
         + "'>"
     )
-    html += "<h2>" + entryId + " (" + entryType + ")</h2> "
+    html += "<h2>" + itemId + " (" + type + ")</h2> "
     html += "<div class='links'>"
     if citeulikeUsername:
         html += (
             "<a href='"
             + citeulikeHref
-            + entryArticleId
+            + articleId
             + "' target='_blank'>CiteULike</a> |"
         )
 
-    list = []
+    librariesList = []
     for name, site in libraries:
-        list.append(
+        librariesList.append(
             " <a href='" + site + cleanedTitle + "' target='_blank'>" + name + "</a>"
         )
-    html += " | ".join(list)
+    html += " | ".join(librariesList)
 
     html += "</div>"
-    html += "<div class='reference'>" + entryTitle
+    html += "<div class='reference'>" + title + " (" + author + ")"
     html += "</div>"
     html += "<ul>"
 
-    for subproblem in entryProblems:
+    for subproblem in problems:
         html += "<li>" + subproblem + "</li>"
         if not options.no_console:
             errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(
-                options.bibFile, lineNumber, entryId, subproblem
+                options.bibFile, lineNumber, itemId, subproblem
             )
             sys.stderr.write(errorMessage)
 
     html += "</ul>"
     html += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
     html += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
-    html += "<div class='bibtex'>" + entryHTML + "</div>"
+    html += "<div class='bibtex'>" + itemHTML + "</div>"
     html += "</div>"
 
     return html
@@ -278,26 +279,29 @@ def generateEntryProblemsHTML(
 entriesIds = []
 entriesProblemsHTML = []
 
+entryArticleId = ""
+entryAuthor = ""
+entryFields = []
 entryHTML = ""
 entryId = ""
-entryType = ""
-entryArticleId = ""
-entryTitle = ""
-entryFields = []
 entryProblems = []
+entryTitle = ""
+entryType = ""
 
-counterMissingFields = 0
 counterFlawedNames = 0
-counterWrongTypes = 0
+counterMissingCommas = 0
+counterMissingFields = 0
 counterNonUniqueId = 0
 counterWrongFieldNames = 0
-counterMissingCommas = 0
+counterWrongTypes = 0
+
+lastLine = 0
 
 ### Global Abusing Handlers ###
 
 
 def handleNewEntryStarting(line):
-    global entryHTML, entryId, entryType, entryArticleId, entryTitle, entryFields, entryProblems
+    global entryArticleId, entryAuthor, entryFields, entryHTML, entryId, entryProblems, entryTitle, entryType
     global counterMissingCommas, counterNonUniqueId
 
     entryFields = []
@@ -319,10 +323,11 @@ def handleNewEntryStarting(line):
     entryHTML = line + "<br />"
 
 
-def handleEntryEnding(line):
-    global entryHTML, entryId, entryType, entryArticleId, entryTitle, entryFields, entryProblems
+def handleEntryEnding(lineNumber, line):
+    global entryArticleId, entryAuthor, entryFields, entryHTML, entryId, entryProblems, entryTitle, entryType
     global counterMissingFields, counterMissingCommas, removePunctuationMap
     global entriesProblemsHTML
+    global lastLine
 
     # Last line of entry is allowed to have missing comma
     if lastLine == lineNumber - 1:
@@ -366,25 +371,27 @@ def handleEntryEnding(line):
             entryType,
             entryArticleId,
             entryTitle,
-            entryFields,
             entryProblems,
+            entryAuthor,
+            lineNumber
         )
         entriesProblemsHTML.append(entryProblemsHTML)
 
 
-def handleEntryLine(line):
-    global entryHTML, entryID, usedIds
+def handleEntryLine(lineNumber, line):
+    global entryHTML, entryId
+    global usedIds
 
     if line != "":
         entryHTML += line + "<br />"
 
     if entryId in usedIds or not usedIds:
         if "=" in line:
-            handleEntryField(line)
+            handleEntryField(lineNumber, line)
 
 
-def handleEntryField(line):
-    global entryHTML, entryId, entryType, entryArticleId, entryTitle, entryFields, entryProblems
+def handleEntryField(lineNumber, line):
+    global entryArticleId, entryAuthor, entryFields, entryHTML, entryId, entryProblems, entryTitle, entryType
     global counterFlawedNames, counterWrongTypes, counterWrongFieldNames, counterMissingCommas
     global lastLine
 
@@ -395,7 +402,7 @@ def handleEntryField(line):
 
     # Checks per field type
     if fieldName == "author":
-        currentAuthor = filter(
+        entryAuthor = filter(
             lambda x: not (x in '\\"{}'), fieldValue.split(" and ")[0]
         )
         for author in fieldValue.split(" and "):
@@ -436,9 +443,7 @@ def handleEntryField(line):
         counterWrongTypes += 1
 
     # check if abbreviations are used in journal titles
-    elif entryType == "article" and (
-        fieldName == "journal" or fieldName == "journaltitle"
-    ):
+    elif entryType == "article" and fieldName in ('journal', 'journaltitle'):
         if "." in line:
             entryProblems.append(
                 "flawed name: abbreviated journal title '" + fieldValue + "'"
@@ -471,19 +476,19 @@ def handleEntryField(line):
 
 ### Parse input file ###
 
-for (lineNumber, line) in enumerate(fIn):
-    line = line.strip("\n")
+for (bibLineNumber, bibLine) in enumerate(fIn):
+    bibLine = bibLine.strip("\n")
 
     # Staring a new entry
-    if line.startswith("@"):
-        handleNewEntryStarting(line)
+    if bibLine.startswith("@"):
+        handleNewEntryStarting(bibLine)
 
     # Closing out the current entry
-    elif line.startswith("}"):
-        handleEntryEnding(line)
+    elif bibLine.startswith("}"):
+        handleEntryEnding(bibLineNumber, bibLine)
 
     else:
-        handleEntryLine(line)
+        handleEntryLine(bibLineNumber, bibLine)
 
 fIn.close()
 
