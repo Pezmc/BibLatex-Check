@@ -27,7 +27,6 @@ libraries = [
     ("ACM", "http://dl.acm.org/results.cfm?query="),
 ]
 
-
 # fields that are required for a specific type of entry
 requiredEntryFields = {
     "article": ["author", "title", "journaltitle/journal", "year/date"],
@@ -77,7 +76,8 @@ import re
 import sys
 from optparse import OptionParser
 
-# Parse options
+### Parse Args ###
+
 usage = (
     sys.argv[0]
     + " [-b|--bib=<input.bib>] [-a|--aux=<input.aux>] [-o|--output=<output.html>] [-v|--view] [-h|--help]"
@@ -121,7 +121,7 @@ parser.add_option(
 
 (options, args) = parser.parse_args()
 
-# Backporting Python 3 open(encoding="utf-8") to Python 2
+### Backport Python 3 open(encoding="utf-8") to Python 2 ###
 # based on http://stackoverflow.com/questions/10971033/backporting-python-3-openencoding-utf-8-to-python-2
 
 if sys.version_info[0] > 2:
@@ -159,8 +159,7 @@ else:
             buffering=buffering,
         )
 
-
-### End Backport ###
+### Handle Args ###
 
 print("INFO: Reading references from '" + options.bibFile + "'")
 try:
@@ -204,8 +203,11 @@ if options.auxFile:
             + "' doesn't exist -> not restricting entries"
         )
 
+#########
+
 # Go through and check all references
 entriesIds = []
+entriesProblemsHTML = []
 
 entryHTML = ""
 entryId = ""
@@ -213,8 +215,7 @@ entryType = ""
 entryArticleId = ""
 entryTitle = ""
 entryFields = []
-problems = []
-subproblems = []
+entryProblems = []
 
 counterMissingFields = 0
 counterFlawedNames = 0
@@ -222,8 +223,6 @@ counterWrongTypes = 0
 counterNonUniqueId = 0
 counterWrongFieldNames = 0
 counterMissingCommas = 0
-
-removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
 
 #######
 
@@ -239,19 +238,19 @@ def resolveAliasedRequiredFields(entryRequiredFields):
 
 
 def handleNewEntryStarting(line):
-    global entryFields, subproblems, entryId, entryType, entryHTML, counterMissingCommas
+    global entryFields, entryProblems, entryId, entryType, entryHTML, counterMissingCommas
 
     entryFields = []
-    subproblems = []
+    entryProblems = []
 
     entryId = line.split("{")[1].rstrip(",\n")
 
     if line[-1] != ",":
-        subproblems.append("missing comma at '@" + entryId + "' definition")
+        entryProblems.append("missing comma at '@" + entryId + "' definition")
         counterMissingCommas += 1
 
     if entryId in entriesIds:
-        subproblems.append("non-unique id: '" + entryId + "'")
+        entryProblems.append("non-unique id: '" + entryId + "'")
         counterNonUniqueId += 1
     else:
         entriesIds.append(entryId)
@@ -261,11 +260,11 @@ def handleNewEntryStarting(line):
 
 
 def handleEntryEnding(line):
-    global entryFields, subproblems, entryHTML, counterMissingFields, counterMissingCommas
+    global entryFields, entryProblems, entryHTML, counterMissingFields, counterMissingCommas
 
     # Last line of entry is allowed to have missing comma 
     if lastLine == lineNumber - 1:
-        subproblems = subproblems[:-1]
+        entryProblems = entryProblems[:-1]
         counterMissingCommas -= 1
 
     # Support for type aliases
@@ -288,13 +287,13 @@ def handleEntryEnding(line):
 
             # at least one the required fields is not found
             if set(requiredEntryField).isdisjoint(entryFields):
-                subproblems.append(
+                entryProblems.append(
                     "missing field '" + "/".join(requiredEntryField) + "'"
                 )
                 counterMissingFields += 1
 
     else:
-        subproblems = []
+        entryProblems = []
 
     if entryId in usedIds or (entryId and not usedIds):
         cleanedTitle = entryTitle.translate(removePunctuationMap)
@@ -302,7 +301,7 @@ def handleEntryEnding(line):
             "<div id='"
             + entryId
             + "' class='problem severe"
-            + str(len(subproblems))
+            + str(len(entryProblems))
             + "'>"
         )
         problem += "<h2>" + entryId + " (" + entryType + ")</h2> "
@@ -331,20 +330,22 @@ def handleEntryEnding(line):
         problem += "<div class='reference'>" + entryTitle
         problem += "</div>"
         problem += "<ul>"
-        for subproblem in subproblems:
+
+        for subproblem in entryProblems:
             problem += "<li>" + subproblem + "</li>"
             if not options.no_console:
                 errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(
                     options.bibFile, lineNumber, entryId, subproblem
                 )
                 sys.stderr.write(errorMessage)
+
         problem += "</ul>"
         problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
         problem += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
         problem += "<div class='bibtex'>" + entryHTML + "</div>"
         problem += "</div>"
-        problems.append(problem)
 
+        entriesProblemsHTML.append(problem)
 
 #######
 
@@ -376,20 +377,20 @@ for (lineNumber, line) in enumerate(fIn):
                     for author in value.split(" and "):
                         comp = author.split(",")
                         if len(comp) == 0:
-                            subproblems.append(
+                            entryProblems.append(
                                 "too little name components for an author in field 'author'"
                             )
                         elif len(comp) > 2:
-                            subproblems.append(
+                            entryProblems.append(
                                 "too many name components for an author in field 'author'"
                             )
                         elif len(comp) == 2:
                             if comp[0].strip() == "":
-                                subproblems.append(
+                                entryProblems.append(
                                     "last name of an author in field 'author' empty"
                                 )
                             if comp[1].strip() == "":
-                                subproblems.append(
+                                entryProblems.append(
                                     "first name of an author in field 'author' empty"
                                 )
 
@@ -404,7 +405,7 @@ for (lineNumber, line) in enumerate(fIn):
 
                 # check if type 'proceedings' might be 'inproceedings'
                 if entryType == "proceedings" and field == "pages":
-                    subproblems.append(
+                    entryProblems.append(
                         "wrong type: maybe should be 'inproceedings' because entry has page numbers"
                     )
                     counterWrongTypes += 1
@@ -415,7 +416,7 @@ for (lineNumber, line) in enumerate(fIn):
                 ):
 
                     if "." in line:
-                        subproblems.append(
+                        entryProblems.append(
                             "flawed name: abbreviated journal title '" + value + "'"
                         )
                         counterFlawedNames += 1
@@ -423,7 +424,7 @@ for (lineNumber, line) in enumerate(fIn):
                 # check booktitle format; expected format "ICBAB '13: Proceeding of the 13th International Conference on Bla and Blubb"
                 # if entryType == "inproceedings" and field == "booktitle":
                 # if ":" not in line or ("Proceedings" not in line and "Companion" not in line) or "." in line or " '" not in line or "workshop" in line or "conference" in line or "symposium" in line:
-                # subproblems.append("flawed name: inconsistent formatting of booktitle '"+value+"'")
+                # entryProblems.append("flawed name: inconsistent formatting of booktitle '"+value+"'")
                 # counterFlawedNames += 1
 
                 # check if title is capitalized (heuristic)
@@ -431,13 +432,13 @@ for (lineNumber, line) in enumerate(fIn):
                 # for word in entryTitle.split(" "):
                 # word = word.strip(":")
                 # if len(word) > 7 and word[0].islower() and not  "-" in word and not "_"  in word and not "[" in word:
-                # subproblems.append("flawed name: non-capitalized title '"+entryTitle+"'")
+                # entryProblems.append("flawed name: non-capitalized title '"+entryTitle+"'")
                 # counterFlawedNames += 1
                 # break
 
                 # check for commas at end of line
                 if line[-1] != ",":
-                    subproblems.append(
+                    entryProblems.append(
                         "missing comma at end of line, at '"
                         + field
                         + "' field definition."
@@ -730,7 +731,7 @@ $(document).ready(function(){
     html.write("<div class='info'><h2>Info</h2><ul>")
     html.write("<li>bib file: " + options.bibFile + "</li>")
     html.write("<li>aux file: " + options.auxFile + "</li>")
-    html.write("<li># entries: " + str(len(problems)) + "</li>")
+    html.write("<li># entries with errors: " + str(len(entriesProblemsHTML)) + "</li>")
     html.write("<li># problems: " + str(problemCount) + "</li><ul>")
     html.write("<li># missing fields: " + str(counterMissingFields) + "</li>")
     html.write("<li># flawed names: " + str(counterFlawedNames) + "</li>")
@@ -740,8 +741,8 @@ $(document).ready(function(){
     html.write("<li># missing comma: " + str(counterMissingCommas) + "</li>")
     html.write("</ul></ul></div>")
 
-    problems.sort()
-    for problem in problems:
+    entriesProblemsHTML.sort()
+    for problem in entriesProblemsHTML:
         html.write(problem)
     html.write("</body></html>")
     html.close()
