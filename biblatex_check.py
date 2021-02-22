@@ -6,7 +6,7 @@ especially developed for requirements in Computer Science.
 """
 
 __author__ = "Pez Cuckow"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __credits__ = ["Pez Cuckow", "BibTex Check 0.2.0 by Fabian Beck"]
 __license__ = "MIT"
 __email__ = "email<at>pezcuckow.com"
@@ -66,6 +66,8 @@ requiredFields = {
     "www": "online",
     "school": "mastersthesis",
 }
+
+fieldAliases = {"school": "institution", "address": "location"}
 
 ####################################################################
 
@@ -249,6 +251,14 @@ for (lineNumber, line) in enumerate(fIn):
         if lastLine == lineNumber - 1:
             subproblems = subproblems[:-1]
             counterMissingCommas -= 1
+
+        # support for type aliases
+        fields = map(
+            lambda typeName: fieldAliases.get(typeName)
+            if typeName in fieldAliases
+            else typeName,
+            fields,
+        )
 
         completeEntry += line + "<br />"
 

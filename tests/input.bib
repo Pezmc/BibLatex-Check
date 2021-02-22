@@ -71,7 +71,7 @@
   langid = {english}
 }
 
-% "report": ["author", "title", "date"]
+% "report": ["author", "title", "type", "institution", "year/date"],
 % 3 author components (should be 'lastname, firstname')
 @report{petersonObservationsModelingSeismic1993,
   title = {Observations and Modeling of Seismic Background Noise},
@@ -84,4 +84,15 @@
   number = {93-322},
   series = {Open-{{File Report}}},
   type = {USGS Numbered Series}
+}
+
+% "report": ["author", "title", "type", "institution", "year/date"],
+% no errors, school is an alias for institution
+@report{bibLatexChecker,
+  author={Pez Cuckow},
+  title={BibLatex-Check},
+  school={Robotics and Autonomous Systems},
+  address={Address is an alias fro location},
+  type = {Website},
+  year = {2014},
 }
