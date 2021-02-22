@@ -159,6 +159,7 @@ else:
             buffering=buffering,
         )
 
+
 ### Handle Args ###
 
 print("INFO: Reading references from '" + options.bibFile + "'")
@@ -203,9 +204,77 @@ if options.auxFile:
             + "' doesn't exist -> not restricting entries"
         )
 
-#########
+### Methods ###
 
-# Go through and check all references
+removePunctuationMap = dict((ord(char), None) for char in string.punctuation)
+
+
+def resolveAliasedRequiredFields(entryRequiredFields, requiredEntryFields):
+    # Aliases use a string to point at another set of fields
+    while isinstance(entryRequiredFields, str):
+        entryRequiredFields = requiredEntryFields.get(entryRequiredFields)
+
+    return entryRequiredFields
+
+
+def generateEntryProblemsHTML(
+    entryHTML,
+    entryId,
+    entryType,
+    entryArticleId,
+    entryTitle,
+    entryFields,
+    entryProblems,
+):
+    cleanedTitle = entryTitle.translate(removePunctuationMap)
+    html = (
+        "<div id='"
+        + entryId
+        + "' class='problem severe"
+        + str(len(entryProblems))
+        + "'>"
+    )
+    html += "<h2>" + entryId + " (" + entryType + ")</h2> "
+    html += "<div class='links'>"
+    if citeulikeUsername:
+        html += (
+            "<a href='"
+            + citeulikeHref
+            + entryArticleId
+            + "' target='_blank'>CiteULike</a> |"
+        )
+
+    list = []
+    for name, site in libraries:
+        list.append(
+            " <a href='" + site + cleanedTitle + "' target='_blank'>" + name + "</a>"
+        )
+    html += " | ".join(list)
+
+    html += "</div>"
+    html += "<div class='reference'>" + entryTitle
+    html += "</div>"
+    html += "<ul>"
+
+    for subproblem in entryProblems:
+        html += "<li>" + subproblem + "</li>"
+        if not options.no_console:
+            errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(
+                options.bibFile, lineNumber, entryId, subproblem
+            )
+            sys.stderr.write(errorMessage)
+
+    html += "</ul>"
+    html += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
+    html += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
+    html += "<div class='bibtex'>" + entryHTML + "</div>"
+    html += "</div>"
+
+    return html
+
+
+### Globals ###
+
 entriesIds = []
 entriesProblemsHTML = []
 
@@ -224,21 +293,12 @@ counterNonUniqueId = 0
 counterWrongFieldNames = 0
 counterMissingCommas = 0
 
-#######
-
-
-def resolveAliasedRequiredFields(entryRequiredFields):
-    global requiredEntryFields
-
-    # Aliases use a string to point at another set of fields
-    while isinstance(entryRequiredFields, str):
-        entryRequiredFields = requiredEntryFields.get(entryRequiredFields)
-
-    return entryRequiredFields
+### Global Abusing Handlers ###
 
 
 def handleNewEntryStarting(line):
-    global entryFields, entryProblems, entryId, entryType, entryHTML, counterMissingCommas
+    global entryHTML, entryId, entryType, entryArticleId, entryTitle, entryFields, entryProblems
+    global counterMissingCommas, counterNonUniqueId
 
     entryFields = []
     entryProblems = []
@@ -260,9 +320,11 @@ def handleNewEntryStarting(line):
 
 
 def handleEntryEnding(line):
-    global entryFields, entryProblems, entryHTML, counterMissingFields, counterMissingCommas
+    global entryHTML, entryId, entryType, entryArticleId, entryTitle, entryFields, entryProblems
+    global counterMissingFields, counterMissingCommas, removePunctuationMap
+    global entriesProblemsHTML
 
-    # Last line of entry is allowed to have missing comma 
+    # Last line of entry is allowed to have missing comma
     if lastLine == lineNumber - 1:
         entryProblems = entryProblems[:-1]
         counterMissingCommas -= 1
@@ -279,7 +341,9 @@ def handleEntryEnding(line):
 
     if entryId in usedIds or not usedIds:
         entryRequiredFields = requiredEntryFields.get(entryType.lower())
-        entryRequiredFields = resolveAliasedRequiredFields(entryRequiredFields)
+        entryRequiredFields = resolveAliasedRequiredFields(
+            entryRequiredFields, requiredEntryFields
+        )
 
         for requiredEntryField in entryRequiredFields:
             # support for author/editor syntax
@@ -296,60 +360,117 @@ def handleEntryEnding(line):
         entryProblems = []
 
     if entryId in usedIds or (entryId and not usedIds):
-        cleanedTitle = entryTitle.translate(removePunctuationMap)
-        problem = (
-            "<div id='"
-            + entryId
-            + "' class='problem severe"
-            + str(len(entryProblems))
-            + "'>"
+        entryProblemsHTML = generateEntryProblemsHTML(
+            entryHTML,
+            entryId,
+            entryType,
+            entryArticleId,
+            entryTitle,
+            entryFields,
+            entryProblems,
         )
-        problem += "<h2>" + entryId + " (" + entryType + ")</h2> "
-        problem += "<div class='links'>"
-        if citeulikeUsername:
-            problem += (
-                "<a href='"
-                + citeulikeHref
-                + entryArticleId
-                + "' target='_blank'>CiteULike</a> |"
-            )
+        entriesProblemsHTML.append(entryProblemsHTML)
 
-        list = []
-        for name, site in libraries:
-            list.append(
-                " <a href='"
-                + site
-                + cleanedTitle
-                + "' target='_blank'>"
-                + name
-                + "</a>"
-            )
-        problem += " | ".join(list)
 
-        problem += "</div>"
-        problem += "<div class='reference'>" + entryTitle
-        problem += "</div>"
-        problem += "<ul>"
+def handleEntryLine(line):
+    global entryHTML, entryID, usedIds
 
-        for subproblem in entryProblems:
-            problem += "<li>" + subproblem + "</li>"
-            if not options.no_console:
-                errorMessage = "PROBLEM: {}:{} - {} - {}\n".format(
-                    options.bibFile, lineNumber, entryId, subproblem
+    if line != "":
+        entryHTML += line + "<br />"
+
+    if entryId in usedIds or not usedIds:
+        if "=" in line:
+            handleEntryField(line)
+
+
+def handleEntryField(line):
+    global entryHTML, entryId, entryType, entryArticleId, entryTitle, entryFields, entryProblems
+    global counterFlawedNames, counterWrongTypes, counterWrongFieldNames, counterMissingCommas
+    global lastLine
+
+    fieldName = line.split("=")[0].strip().lower()  # biblatex is not case sensitive
+    fieldValue = line.split("=")[1].strip(", \n").strip("{} \n")
+
+    entryFields.append(fieldName)
+
+    # Checks per field type
+    if fieldName == "author":
+        currentAuthor = filter(
+            lambda x: not (x in '\\"{}'), fieldValue.split(" and ")[0]
+        )
+        for author in fieldValue.split(" and "):
+            comp = author.split(",")
+            if len(comp) == 0:
+                entryProblems.append(
+                    "too little name components for an author in field 'author'"
                 )
-                sys.stderr.write(errorMessage)
+            elif len(comp) > 2:
+                entryProblems.append(
+                    "too many name components for an author in field 'author'"
+                )
+            elif len(comp) == 2:
+                if comp[0].strip() == "":
+                    entryProblems.append(
+                        "last name of an author in field 'author' empty"
+                    )
+                if comp[1].strip() == "":
+                    entryProblems.append(
+                        "first name of an author in field 'author' empty"
+                    )
 
-        problem += "</ul>"
-        problem += "<form class='problem_control'><label>checked</label><input type='checkbox' class='checked'/></form>"
-        problem += "<div class='bibtex_toggle'>Current BibLaTex Entry</div>"
-        problem += "<div class='bibtex'>" + entryHTML + "</div>"
-        problem += "</div>"
+    elif fieldName == "citeulike-article-id":
+        entryArticleId = fieldValue
 
-        entriesProblemsHTML.append(problem)
+    elif fieldName == "title":
+        entryTitle = re.sub(r"\}|\{", r"", fieldValue)
 
-#######
+    ###############################################################
+    # Checks (please (de)activate/extend to your needs)
+    ###############################################################
 
-# Loop over then input file
+    # check if type 'proceedings' might be 'inproceedings'
+    elif entryType == "proceedings" and fieldName == "pages":
+        entryProblems.append(
+            "wrong type: maybe should be 'inproceedings' because entry has page numbers"
+        )
+        counterWrongTypes += 1
+
+    # check if abbreviations are used in journal titles
+    elif entryType == "article" and (
+        fieldName == "journal" or fieldName == "journaltitle"
+    ):
+        if "." in line:
+            entryProblems.append(
+                "flawed name: abbreviated journal title '" + fieldValue + "'"
+            )
+            counterFlawedNames += 1
+
+    # check booktitle format; expected format "ICBAB '13: Proceeding of the 13th International Conference on Bla and Blubb"
+    # if entryType == "inproceedings" and fieldName == "booktitle":
+    # if ":" not in line or ("Proceedings" not in line and "Companion" not in line) or "." in line or " '" not in line or "workshop" in line or "conference" in line or "symposium" in line:
+    # entryProblems.append("flawed name: inconsistent formatting of booktitle '"+fieldValue+"'")
+    # counterFlawedNames += 1
+
+    # check if title is capitalized (heuristic)
+    # if fieldName == "title":
+    # for word in entryTitle.split(" "):
+    # word = word.strip(":")
+    # if len(word) > 7 and word[0].islower() and not  "-" in word and not "_"  in word and not "[" in word:
+    # entryProblems.append("flawed name: non-capitalized title '"+entryTitle+"'")
+    # counterFlawedNames += 1
+    # break
+
+    # check for commas at end of line
+    if line[-1] != ",":
+        entryProblems.append(
+            "missing comma at end of line, at '" + fieldName + "' field definition."
+        )
+        counterMissingCommas += 1
+        lastLine = lineNumber
+
+
+### Parse input file ###
+
 for (lineNumber, line) in enumerate(fIn):
     line = line.strip("\n")
 
@@ -362,90 +483,7 @@ for (lineNumber, line) in enumerate(fIn):
         handleEntryEnding(line)
 
     else:
-        if line != "":
-            entryHTML += line + "<br />"
-        if entryId in usedIds or not usedIds:
-            if "=" in line:
-                # biblatex is not case sensitive
-                field = line.split("=")[0].strip().lower()
-                entryFields.append(field)
-                value = line.split("=")[1].strip(", \n").strip("{} \n")
-                if field == "author":
-                    currentAuthor = filter(
-                        lambda x: not (x in '\\"{}'), value.split(" and ")[0]
-                    )
-                    for author in value.split(" and "):
-                        comp = author.split(",")
-                        if len(comp) == 0:
-                            entryProblems.append(
-                                "too little name components for an author in field 'author'"
-                            )
-                        elif len(comp) > 2:
-                            entryProblems.append(
-                                "too many name components for an author in field 'author'"
-                            )
-                        elif len(comp) == 2:
-                            if comp[0].strip() == "":
-                                entryProblems.append(
-                                    "last name of an author in field 'author' empty"
-                                )
-                            if comp[1].strip() == "":
-                                entryProblems.append(
-                                    "first name of an author in field 'author' empty"
-                                )
-
-                if field == "citeulike-article-id":
-                    entryArticleId = value
-                if field == "title":
-                    entryTitle = re.sub(r"\}|\{", r"", value)
-
-                ###############################################################
-                # Checks (please (de)activate/extend to your needs)
-                ###############################################################
-
-                # check if type 'proceedings' might be 'inproceedings'
-                if entryType == "proceedings" and field == "pages":
-                    entryProblems.append(
-                        "wrong type: maybe should be 'inproceedings' because entry has page numbers"
-                    )
-                    counterWrongTypes += 1
-
-                # check if abbreviations are used in journal titles
-                if entryType == "article" and (
-                    field == "journal" or field == "journaltitle"
-                ):
-
-                    if "." in line:
-                        entryProblems.append(
-                            "flawed name: abbreviated journal title '" + value + "'"
-                        )
-                        counterFlawedNames += 1
-
-                # check booktitle format; expected format "ICBAB '13: Proceeding of the 13th International Conference on Bla and Blubb"
-                # if entryType == "inproceedings" and field == "booktitle":
-                # if ":" not in line or ("Proceedings" not in line and "Companion" not in line) or "." in line or " '" not in line or "workshop" in line or "conference" in line or "symposium" in line:
-                # entryProblems.append("flawed name: inconsistent formatting of booktitle '"+value+"'")
-                # counterFlawedNames += 1
-
-                # check if title is capitalized (heuristic)
-                # if field == "title":
-                # for word in entryTitle.split(" "):
-                # word = word.strip(":")
-                # if len(word) > 7 and word[0].islower() and not  "-" in word and not "_"  in word and not "[" in word:
-                # entryProblems.append("flawed name: non-capitalized title '"+entryTitle+"'")
-                # counterFlawedNames += 1
-                # break
-
-                # check for commas at end of line
-                if line[-1] != ",":
-                    entryProblems.append(
-                        "missing comma at end of line, at '"
-                        + field
-                        + "' field definition."
-                    )
-                    counterMissingCommas += 1
-                    lastLine = lineNumber
-                ###############################################################
+        handleEntryLine(line)
 
 fIn.close()
 
