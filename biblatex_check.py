@@ -67,6 +67,8 @@ requiredFields = {
     "school": "mastersthesis",
 }
 
+fieldAliases = {"school": "institution", "address": "location"}
+
 ####################################################################
 
 import string
@@ -249,6 +251,14 @@ for (lineNumber, line) in enumerate(fIn):
         if lastLine == lineNumber - 1:
             subproblems = subproblems[:-1]
             counterMissingCommas -= 1
+
+        # support for type aliases
+        fields = map(
+            lambda typeName: fieldAliases.get(typeName)
+            if typeName in fieldAliases
+            else typeName,
+            fields,
+        )
 
         completeEntry += line + "<br />"
 
