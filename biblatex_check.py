@@ -389,7 +389,7 @@ def handleEntryField(lineNumber, line):
 
     # Checks per field type
     if fieldName == "author":
-        entryAuthor = filter(lambda x: not (x in '\\"{}'), fieldValue.split(" and ")[0])
+        entryAuthor = "".join(filter(lambda x: not (x in '\\"{}'), fieldValue.split(" and ")[0]))
         for author in fieldValue.split(" and "):
             comp = author.split(",")
             if len(comp) == 0:

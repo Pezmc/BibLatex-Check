@@ -1,5 +1,5 @@
 % This file should fail with the commented errors
-% 14 errors expected
+% 15 errors expected
 
 % "misc": ["author/editor", "title", "year/date"]
 % year/date missing
@@ -95,4 +95,13 @@
   address={Address is an alias fro location},
   type = {Website},
   year = {2014},
+}
+
+% "book": ["author", "title", "year/date"],
+% Capitals handled, and no errors in author field
+% year/date field missing
+@book {hartshorne1977algebraic,
+  AUTHOR = {Hartshorne R},
+  TITLE = {Algebraic geometry},
+  NOTE = {Graduate Texts in Mathematics, No. 52},
 }
