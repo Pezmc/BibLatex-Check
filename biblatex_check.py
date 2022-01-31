@@ -322,12 +322,12 @@ def handleEntryEnding(lineNumber, line):
         counterMissingCommas -= 1
 
     # Support for type aliases
-    entryFields = map(
+    entryFields = list(map(
         lambda typeName: fieldAliases.get(typeName)
         if typeName in fieldAliases
         else typeName,
         entryFields,
-    )
+    ))
 
     entryHTML += line + "<br />"
 
