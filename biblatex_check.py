@@ -776,9 +776,11 @@ $(document).ready(function(){
     html.close()
 
     if options.view:
+        import os
+        import pathlib
         import webbrowser
 
-        webbrowser.open(html.name)
+        webbrowser.open(pathlib.Path(os.path.abspath(html.name)).as_uri())
 
     print("SUCCESS: Report {} has been generated".format(options.htmlOutput))
 
