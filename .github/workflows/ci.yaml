@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    name: Testing
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Run tests
+        shell: bash
+        run: |
+          CORRECT_N_PROBLEMS=$(grep -oP '\d+(?= errors expected)' tests/input.bib )
+          N_PROBLEMS=$(python ./biblatex_check.py -N -b tests/input.bib | grep -oP '\d+(?= problems)')
+          if [[ "$N_PROBLEMS" == "$CORRECT_N_PROBLEMS" ]]; then
+            echo "Correct number of problems"
+          else
+            echo "Incorrect number of problems, $N_PROBLEMS instead of 15"
+            exit 1
+          fi
