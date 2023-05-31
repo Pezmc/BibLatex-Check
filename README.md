@@ -10,7 +10,7 @@ Any PR's will be reviewed promptly.
 BibLatex-Check
 ==============
 
-**A web based version of this checker is now available: https://biblatex-linter.herokuapp.com/** [(repo)](https://github.com/Pezmc/BibLatex-Linter)
+**A web based version of this checker is now available: https://github.com/Pezmc/BibLatex-Linter**
 
 *A python2/3 script for checking BibLatex .bib files*
 
